@@ -7,4 +7,12 @@ class ConsultasLocalDataSourceImpl: ConsultasLocalDataSource  {
     override fun getConsultasLocal(): Flow<List<ConsultasModel>> {
         TODO("Not yet implemented")
     }
+
+    override fun getCountConsultasLocal(): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteConsultasLocal() {
+        TODO("Not yet implemented")
+    }
 }

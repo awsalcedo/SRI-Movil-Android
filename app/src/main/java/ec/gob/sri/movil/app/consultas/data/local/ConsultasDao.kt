@@ -11,6 +11,9 @@ interface ConsultasDao {
     @Query("SELECT * FROM consultas")
     fun getConsultas(): Flow<List<ConsultasEntity>>
 
+    @Query("SELECT COUNT(*) FROM consultas")
+    fun getCountConsultas(): Int
+
     @Delete
     fun deleteConsultas()
 }

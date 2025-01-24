@@ -5,4 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface ConsultasLocalDataSource {
     fun getConsultasLocal(): Flow<List<ConsultasModel>>
+    fun getCountConsultasLocal(): Int
+    fun deleteConsultasLocal()
 }
