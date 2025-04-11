@@ -73,6 +73,9 @@ dependencies {
     ksp(libs.room.compiler)
     implementation(libs.androidx.room.runtime)
 
+    // Timber
+    implementation(libs.timber)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

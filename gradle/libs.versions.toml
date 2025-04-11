@@ -17,6 +17,7 @@ kotlinxSerialization = "1.6.3"
 roomKtx = "2.6.1"
 hilt-navigation-compose = "1.2.0"
 hilt-compiler = "1.2.0"
+timber = "5.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -55,6 +56,9 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomKtx" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomKtx" }
+
+# Timber
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
