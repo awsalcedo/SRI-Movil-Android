@@ -40,6 +40,11 @@ android {
     buildFeatures {
         compose = true
     }
+
+    composeCompiler {
+        reportsDestination = file("build/outputs/compose_reports")
+        metricsDestination = file("build/outputs/compose_metrics")
+    }
 }
 
 dependencies {

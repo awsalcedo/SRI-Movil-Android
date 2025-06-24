@@ -11,21 +11,16 @@ class ConsultasRepositoryImpl(
     private val localDataSource: ConsultasLocalDataSource
 ) : ConsultasRepository {
 
-    override suspend fun getConsultas(): Flow<List<ConsultasModel>> {
-
+    override fun getConsultas(): Flow<List<ConsultasModel>> {
         return try {
-            if ( localDataSource.getCountConsultasLocal() == 0 ) {
+            localDataSource.getConsultasLocal()
+            /*if (localDataSource.getCountConsultasLocal() == 0) {
                 remoteDataSource.getConsultasApi()
             } else {
                 localDataSource.getConsultasLocal()
-            }
+            }*/
         } catch (e: Exception) {
             remoteDataSource.getConsultasApi()
         }
-
-
-
-
-
     }
 }
