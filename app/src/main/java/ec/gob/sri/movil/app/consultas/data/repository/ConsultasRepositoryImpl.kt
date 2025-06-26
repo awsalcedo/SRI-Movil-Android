@@ -12,7 +12,8 @@ class ConsultasRepositoryImpl(
 ) : ConsultasRepository {
 
     override fun getConsultas(): Flow<List<ConsultasModel>> {
-        return try {
+        return localDataSource.getConsultasLocal()
+        /*return try {
             localDataSource.getConsultasLocal()
             /*if (localDataSource.getCountConsultasLocal() == 0) {
                 remoteDataSource.getConsultasApi()
@@ -21,6 +22,6 @@ class ConsultasRepositoryImpl(
             }*/
         } catch (e: Exception) {
             remoteDataSource.getConsultasApi()
-        }
+        }*/
     }
 }
