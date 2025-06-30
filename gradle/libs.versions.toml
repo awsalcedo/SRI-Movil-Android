@@ -18,6 +18,8 @@ roomKtx = "2.7.2"
 hilt-navigation-compose = "1.2.0"
 hilt-compiler = "1.2.0"
 timber = "5.0.1"
+adaptative = "1.1.2"
+adaptiveAndroid = "1.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -34,6 +36,7 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+material3-adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "adaptative" }
 
 # Retrofit
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
@@ -59,6 +62,7 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomKtx
 
 # Timber
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+androidx-adaptive-android = { group = "androidx.compose.material3.adaptive", name = "adaptive-android", version.ref = "adaptiveAndroid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
