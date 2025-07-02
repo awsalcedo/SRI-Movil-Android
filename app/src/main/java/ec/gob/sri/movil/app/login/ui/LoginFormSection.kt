@@ -34,15 +34,15 @@ fun LoginFormSection(
         SriTextField(
             text = userText,
             onValueChange = onEmailTextChange,
-            label = "Ruc / C.I. / Pasaporte",
-            hint = "RUC, Cédula o Pasaporte",
+            label = "RUC / C.I. / Pasaporte",
+            hint = "Ruc, Cédula o Pasaporte",
             isInputSecret = false,
             keyboardActions = KeyboardActions(onAny = {
                 focusManager.moveFocus(FocusDirection.Next)
             }),
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(14.dp))
         SriTextField(
             text = adicionalText,
             onValueChange = onAdicionalTextChange,
@@ -54,7 +54,7 @@ fun LoginFormSection(
             }),
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(14.dp))
         SriTextField(
             text = passwordText,
             onValueChange = onPasswordTextChange,
@@ -73,7 +73,7 @@ fun LoginFormSection(
             onClick = {},
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(14.dp))
         SriLink(
             text = "Cambiar de usuario",
             onClick = {},

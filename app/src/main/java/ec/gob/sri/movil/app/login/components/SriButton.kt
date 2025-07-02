@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
@@ -22,13 +23,14 @@ fun SriButton(
         modifier = modifier,
         shape = RoundedCornerShape(10.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary
+            containerColor = Color.White
         ),
         contentPadding = PaddingValues(12.dp)
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.titleSmall
+            style = MaterialTheme.typography.titleMedium,
+            color = Color.Black
         )
     }
 }

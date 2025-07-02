@@ -9,6 +9,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -43,35 +44,44 @@ fun SriTextField(
 ) {
     //Para componentes autónomos donde nunca tenga un comportamiento diferente para el ícono de visibilidad,
     //Porque al final sólo queremos alternar la visibilidad cuando se presionamos en él, no es necesario usar un viewmodel
-    var isPasswordVisible by remember { mutableStateOf(false) }
+    var isPasswordVisible by remember { mutableStateOf(isInputSecret) }
 
     Column(
         modifier = modifier
     ) {
-        Text(
+        /*Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium
-        )
+        )*/
         Spacer(modifier = Modifier.height(6.dp))
         OutlinedTextField(
             value = text,
             onValueChange = onValueChange,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .semantics { contentDescription = label },
             visualTransformation = if (isPasswordVisible) {
                 PasswordVisualTransformation(mask = '*')
             } else VisualTransformation.None,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                cursorColor = MaterialTheme.colorScheme.primary,
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = Color.Transparent
+                focusedBorderColor = Color.White,
+                unfocusedBorderColor = Color.White.copy(alpha = 0.90f),
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White.copy(alpha = 0.90f),
+                cursorColor = Color.White.copy(alpha = 0.90f)
             ),
+            label = {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.White.copy(alpha = 0.90f)
+                )
+            },
             placeholder = {
                 Text(
                     text = hint,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.White.copy(alpha = 0.90f)
                 )
             },
             textStyle = MaterialTheme.typography.bodyLarge,
@@ -79,6 +89,9 @@ fun SriTextField(
             trailingIcon = {
                 if (isInputSecret) {
                     IconButton(
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = Color.White.copy(alpha = 0.90f)
+                        ),
                         onClick = {
                             isPasswordVisible = !isPasswordVisible
                         }
@@ -115,7 +128,8 @@ fun SriTextField(
                     imeAction = ImeAction.Done
                 )
             },
-            keyboardActions = keyboardActions
+            keyboardActions = keyboardActions,
+            singleLine = true
         )
     }
 }

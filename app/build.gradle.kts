@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -11,6 +14,13 @@ android {
     namespace = "ec.gob.sri.movil.app"
     compileSdk = 35
 
+    val localPropertiesFile = rootProject.file("local.properties")
+    val localProperties = Properties().apply {
+        if (localPropertiesFile.exists()) {
+            load(FileInputStream(localPropertiesFile))
+        }
+    }
+
     defaultConfig {
         applicationId = "ec.gob.sri.movil.app"
         minSdk = 24
@@ -23,11 +33,28 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+            val baseUrl = localProperties.getProperty("BASE_URL")
+                ?: IllegalArgumentException("Property BASE_URL is not found in local.properties")
+            buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
+
+            val contextApi = localProperties.getProperty("CONTEXT_API")
+                ?: IllegalArgumentException("Property CONTEXT_API is not found in local.properties")
+            buildConfigField("String", "CONTEXT_API", "\"$contextApi\"")
+        }
+        debug {
+            val baseUrl = localProperties.getProperty("BASE_URL")
+                ?: IllegalArgumentException("Property BASE_URL is not found in local.properties")
+            buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
+
+            val contextApi = localProperties.getProperty("CONTEXT_API")
+                ?: IllegalArgumentException("Property CONTEXT_API is not found in local.properties")
+            buildConfigField("String", "CONTEXT_API", "\"$contextApi\"")
         }
     }
     compileOptions {
@@ -39,6 +66,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     composeCompiler {
