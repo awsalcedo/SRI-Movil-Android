@@ -9,10 +9,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import ec.gob.sri.movil.app.navigation.NavigationHost
+import dagger.hilt.android.AndroidEntryPoint
 import ec.gob.sri.movil.app.navigation.NavigationRoute
+import ec.gob.sri.movil.app.navigation.NavigationHost
 import ec.gob.sri.movil.app.ui.theme.SRIMovilAndroidTheme
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,7 +28,7 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     NavigationHost(
                         navController = navController,
-                        startDestination = NavigationRoute.LoginScreen
+                        startDestination = NavigationRoute.EstadoTributarioScreen
                     )
                 }
             }

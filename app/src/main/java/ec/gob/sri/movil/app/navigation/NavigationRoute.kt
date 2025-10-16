@@ -12,13 +12,19 @@ object ConsultasScreen
 object EstadoTributarioScreen
 
 @Serializable
+object MatriculacionVehicularScreen
+
+
 sealed class NavigationRoute {
     @Serializable
-    object LoginScreen : NavigationRoute()
+    data object LoginScreen: NavigationRoute()
 
     @Serializable
-    object ConsultasScreen : NavigationRoute()
+    data object ConsultasScreen: NavigationRoute()
 
     @Serializable
-    object EstadoTributarioScreen : NavigationRoute()
+    data object EstadoTributarioScreen: NavigationRoute()
+
+    @Serializable
+    data object MatriculacionVehicularScreen: NavigationRoute()
 }

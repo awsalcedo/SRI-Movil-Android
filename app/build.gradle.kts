@@ -12,19 +12,20 @@ plugins {
 
 android {
     namespace = "ec.gob.sri.movil.app"
-    compileSdk = 35
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
+    val localProperties = Properties()
     val localPropertiesFile = rootProject.file("local.properties")
-    val localProperties = Properties().apply {
-        if (localPropertiesFile.exists()) {
-            load(FileInputStream(localPropertiesFile))
+    if (localPropertiesFile.exists() && localPropertiesFile.isFile) {
+        localPropertiesFile.inputStream().use { input ->
+            localProperties.load(input)
         }
     }
 
     defaultConfig {
         applicationId = "ec.gob.sri.movil.app"
-        minSdk = 24
-        targetSdk = 35
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
 
@@ -76,7 +77,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -99,6 +99,7 @@ dependencies {
 
     // Retrofit
     implementation(libs.retrofit)
+    implementation(libs.converter.kotlinx.serialization)
     implementation(libs.retrofit.converter)
     implementation(libs.interceptor)
 
