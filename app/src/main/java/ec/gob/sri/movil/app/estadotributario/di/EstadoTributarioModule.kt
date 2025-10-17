@@ -4,7 +4,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import ec.gob.sri.movil.app.core.domain.error.ErrorHandler
 import ec.gob.sri.movil.app.estadotributario.data.remote.datasource.EstadoTributarioRemoteDataSource
 import ec.gob.sri.movil.app.estadotributario.data.remote.datasource.EstadoTributarioRemoteDataSourceImpl
 import ec.gob.sri.movil.app.estadotributario.data.remote.repository.EstadoTributarioRepositoryImpl
@@ -30,14 +29,8 @@ object EstadoTributarioModule {
 
     @Provides
     @Singleton
-    fun provideEstadoTributarioDataSource(
-        apiService: EstadoTributarioService,
-        errorHandler: ErrorHandler
-    ): EstadoTributarioRemoteDataSource {
-        return EstadoTributarioRemoteDataSourceImpl(
-            apiService = apiService,
-            errorHandler = errorHandler
-        )
+    fun provideEstadoTributarioDataSource(apiService: EstadoTributarioService): EstadoTributarioRemoteDataSource {
+        return EstadoTributarioRemoteDataSourceImpl(apiService = apiService)
     }
 
     @Provides

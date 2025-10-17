@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">SRI Movil Android</string>
+    
+    <!-- Error Messages -->
+    <string name="error_no_internet">Sin conexión a internet</string>
+    <string name="error_network">Error de red</string>
+    <string name="error_unauthorized">No autorizado</string>
+    <string name="error_forbidden">Acceso denegado</string>
+    <string name="error_not_found">Recurso no encontrado</string>
+    <string name="error_server">Error del servidor</string>
+    <string name="error_unknown">Error desconocido</string>
+    <string name="error_generic">Algo salió mal. Inténtalo de nuevo</string>
 </resources>
