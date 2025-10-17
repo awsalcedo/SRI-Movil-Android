@@ -2,6 +2,7 @@ package ec.gob.sri.movil.app.estadotributario.data.remote.datasource
 
 import ec.gob.sri.movil.app.core.domain.DataResult
 import ec.gob.sri.movil.app.core.domain.DataError
+import ec.gob.sri.movil.app.estadotributario.data.common.mapHttpResponseError
 import ec.gob.sri.movil.app.estadotributario.data.mapper.toDomain
 import ec.gob.sri.movil.app.estadotributario.data.remote.service.EstadoTributarioService
 import ec.gob.sri.movil.app.estadotributario.domain.models.EstadoTributarioDomain
@@ -27,7 +28,8 @@ class EstadoTributarioRemoteDataSourceImpl @Inject constructor(
                     DataResult.Error(DataError.Network.Unknown)
                 }
             } else {
-                DataResult.Error(DataError.Network.Unknown)
+                // Use the specific HTTP error mapper
+                DataResult.Error(mapHttpResponseError(response))
             }
         } catch (e: CancellationException) {
             throw e
@@ -36,7 +38,8 @@ class EstadoTributarioRemoteDataSourceImpl @Inject constructor(
         } catch (e: IOException) {
             DataResult.Error(DataError.Network.NoInternet)
         } catch (e: HttpException) {
-            DataResult.Error(DataError.Network.Unknown)
+            // Use the specific HTTP error mapper for HttpException
+            DataResult.Error(mapHttpException(e))
         } catch (e: Exception) {
             DataResult.Error(DataError.Network.Unknown)
         }
