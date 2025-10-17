@@ -3,6 +3,7 @@ package ec.gob.sri.movil.app.estadotributario.ui
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ec.gob.sri.movil.app.core.domain.DataResult
 import ec.gob.sri.movil.app.core.domain.ErrorHandler
 import ec.gob.sri.movil.app.core.presentation.BaseViewModel
 import ec.gob.sri.movil.app.estadotributario.domain.models.EstadoTributarioDomain
@@ -22,12 +23,13 @@ class EstadoTributarioViewModel @Inject constructor(
     val estadoTributario: StateFlow<EstadoTributarioDomain?> = _estadoTributario.asStateFlow()
     
     fun consultarEstadoTributario(context: Context, ruc: String) {
-        executeOperation(
+        executeDataOperation(
             operation = { estadoTributarioUseCase(ruc) },
             onSuccess = { data ->
                 _estadoTributario.value = data
             },
-            onError = { errorMessage ->
+            onError = { dataError ->
+                val errorMessage = errorHandler.getErrorMessage(context, dataError)
                 setError(errorMessage)
             }
         )

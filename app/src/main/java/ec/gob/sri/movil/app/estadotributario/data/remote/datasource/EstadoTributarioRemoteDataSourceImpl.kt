@@ -1,31 +1,44 @@
 package ec.gob.sri.movil.app.estadotributario.data.remote.datasource
 
-import ec.gob.sri.movil.app.core.domain.Result
+import ec.gob.sri.movil.app.core.domain.DataResult
+import ec.gob.sri.movil.app.core.domain.DataError
 import ec.gob.sri.movil.app.estadotributario.data.mapper.toDomain
 import ec.gob.sri.movil.app.estadotributario.data.remote.service.EstadoTributarioService
 import ec.gob.sri.movil.app.estadotributario.domain.models.EstadoTributarioDomain
+import kotlinx.coroutines.CancellationException
+import retrofit2.HttpException
+import java.io.IOException
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 class EstadoTributarioRemoteDataSourceImpl @Inject constructor(
     private val apiService: EstadoTributarioService
 ) : EstadoTributarioRemoteDataSource {
     
-    override suspend fun consultarEstadoTributarioApi(ruc: String): Result<EstadoTributarioDomain> {
+    override suspend fun consultarEstadoTributarioApi(ruc: String): DataResult<EstadoTributarioDomain, DataError.Network> {
         return try {
             val response = apiService.consultarApi(ruc)
             
             if (response.isSuccessful) {
                 val body = response.body()
                 if (body != null) {
-                    Result.Success(body.toDomain())
+                    DataResult.Success(body.toDomain())
                 } else {
-                    Result.Error(Exception("Response body is null"))
+                    DataResult.Error(DataError.Network.Unknown)
                 }
             } else {
-                Result.Error(Exception("API returned error: ${response.code()}"))
+                DataResult.Error(DataError.Network.Unknown)
             }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: UnknownHostException) {
+            DataResult.Error(DataError.Network.NoInternet)
+        } catch (e: IOException) {
+            DataResult.Error(DataError.Network.NoInternet)
+        } catch (e: HttpException) {
+            DataResult.Error(DataError.Network.Unknown)
         } catch (e: Exception) {
-            Result.Error(e)
+            DataResult.Error(DataError.Network.Unknown)
         }
     }
 }

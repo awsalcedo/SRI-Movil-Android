@@ -1,6 +1,7 @@
 package ec.gob.sri.movil.app.estadotributario.data.remote.repository
 
-import ec.gob.sri.movil.app.core.domain.Result
+import ec.gob.sri.movil.app.core.domain.DataResult
+import ec.gob.sri.movil.app.core.domain.DataError
 import ec.gob.sri.movil.app.estadotributario.data.remote.datasource.EstadoTributarioRemoteDataSource
 import ec.gob.sri.movil.app.estadotributario.domain.models.EstadoTributarioDomain
 import ec.gob.sri.movil.app.estadotributario.domain.repository.EstadoTributarioRepository
@@ -10,7 +11,7 @@ class EstadoTributarioRepositoryImpl @Inject constructor(
     private val remoteDataSource: EstadoTributarioRemoteDataSource
 ) : EstadoTributarioRepository {
     
-    override suspend fun consultarEstadoTributario(ruc: String): Result<EstadoTributarioDomain> {
+    override suspend fun consultarEstadoTributario(ruc: String): DataResult<EstadoTributarioDomain, DataError.Network> {
         return remoteDataSource.consultarEstadoTributarioApi(ruc)
     }
 }

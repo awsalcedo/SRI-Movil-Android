@@ -3,6 +3,8 @@ package ec.gob.sri.movil.app.core.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ec.gob.sri.movil.app.core.domain.Result
+import ec.gob.sri.movil.app.core.domain.DataResult
+import ec.gob.sri.movil.app.core.domain.DataError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -50,6 +52,31 @@ abstract class BaseViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 onError(e.message ?: "Error desconocido")
+            } finally {
+                setLoading(false)
+            }
+        }
+    }
+    
+    /**
+     * Execute a DataResult operation with automatic loading and error handling
+     */
+    protected fun <T, E : DataError> executeDataOperation(
+        operation: suspend () -> DataResult<T, E>,
+        onSuccess: (T) -> Unit = {},
+        onError: (E) -> Unit = {}
+    ) {
+        viewModelScope.launch {
+            try {
+                setLoading(true)
+                clearError()
+                
+                when (val result = operation()) {
+                    is DataResult.Success -> onSuccess(result.data)
+                    is DataResult.Error -> onError(result.error)
+                }
+            } catch (e: Exception) {
+                setError(e.message ?: "Error desconocido")
             } finally {
                 setLoading(false)
             }
