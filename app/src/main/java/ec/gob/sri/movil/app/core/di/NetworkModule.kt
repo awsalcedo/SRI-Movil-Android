@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ec.gob.sri.movil.app.BuildConfig.BASE_URL
+import ec.gob.sri.movil.app.BuildConfig.CONTEXT_API
 import ec.gob.sri.movil.app.estadotributario.data.remote.service.EstadoTributarioService
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -32,9 +33,18 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(@Named("BaseUrl") baseUrl: String, okHttpClient: OkHttpClient): Retrofit =
+    @Named("ContextApi")
+    fun provideContexApi(): String = CONTEXT_API
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(
+        @Named("BaseUrl") baseUrl: String,
+        @Named("ContextApi") contextApi: String,
+        okHttpClient: OkHttpClient
+    ): Retrofit =
         Retrofit.Builder()
-            .baseUrl(baseUrl)
+            .baseUrl(baseUrl + contextApi)
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()

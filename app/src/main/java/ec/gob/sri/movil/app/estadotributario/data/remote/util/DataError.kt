@@ -28,25 +28,25 @@ sealed interface DataError : Error {
             override val code = 409
         }
 
-        data class UnprocessableEntity(override val body: String?): Http {
+        data class UnprocessableEntity(override val body: String?) : Http {
             override val code = 422
         }
 
-        data class PayLoadTooLarge(override val body: String?): Http {
+        data class PayLoadTooLarge(override val body: String?) : Http {
             override val code = 413
         }
 
-        data class RequestTimeout(override val body: String?): Http {
+        data class RequestTimeout(override val body: String?) : Http {
             override val code = 408
         }
 
-        data class TooManyRequests(override val body: String?): Http {
+        data class TooManyRequests(override val body: String?) : Http {
             override val code = 429
         }
 
-        data class ServerError(override val code: Int, override val body: String?): Http // 5xx
+        data class ServerError(override val code: Int, override val body: String?) : Http // 5xx
 
-        data class UnexpectedHttp(override val code: Int, override val body: String?): Http
+        data class UnexpectedHttp(override val code: Int, override val body: String?) : Http
 
         // Red / otras condiciones
 
@@ -55,7 +55,7 @@ sealed interface DataError : Error {
         data class Serialization(
             val cause: Throwable,
             val jsonPath: String? = null
-        )
+        ) : Network
 
         data object Unknown : Network
     }

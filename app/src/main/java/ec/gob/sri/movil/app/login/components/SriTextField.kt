@@ -39,6 +39,7 @@ fun SriTextField(
     label: String,
     hint: String,
     isInputSecret: Boolean,
+    isLogin: Boolean,
     keyboardActions: KeyboardActions = KeyboardActions(),
     modifier: Modifier = Modifier
 ) {
@@ -63,25 +64,35 @@ fun SriTextField(
             visualTransformation = if (isPasswordVisible) {
                 PasswordVisualTransformation(mask = '*')
             } else VisualTransformation.None,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.White,
-                unfocusedBorderColor = Color.White.copy(alpha = 0.90f),
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White.copy(alpha = 0.90f),
-                cursorColor = Color.White.copy(alpha = 0.90f)
-            ),
+            colors = if (isLogin) {
+                OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color.White,
+                    unfocusedBorderColor = Color.White.copy(alpha = 0.90f),
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White.copy(alpha = 0.90f),
+                    cursorColor = Color.White.copy(alpha = 0.90f)
+                )
+            } else {
+                OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color.Black,
+                    unfocusedBorderColor = Color.Black.copy(alpha = 0.90f),
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black.copy(alpha = 0.90f),
+                    cursorColor = Color.Black.copy(alpha = 0.90f)
+                )
+            },
             label = {
                 Text(
                     text = label,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White.copy(alpha = 0.90f)
+                    color = if (isLogin) Color.White.copy(alpha = 0.90f) else Color.Black.copy(alpha = 0.90f)
                 )
             },
             placeholder = {
                 Text(
                     text = hint,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White.copy(alpha = 0.90f)
+                    color = if (isLogin) Color.White.copy(alpha = 0.90f) else Color.Black.copy(alpha = 0.90f)
                 )
             },
             textStyle = MaterialTheme.typography.bodyLarge,
@@ -121,6 +132,12 @@ fun SriTextField(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Next
                 )
+            } else if (isLogin) {
+                KeyboardOptions(
+                    autoCorrectEnabled = false,
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next
+                )
             } else {
                 KeyboardOptions(
                     autoCorrectEnabled = false,
@@ -137,11 +154,11 @@ fun SriTextField(
 @Preview(showBackground = true)
 @Composable
 fun SriTextFieldPasswordPreview() {
-    SriTextField("", {}, "Clave", "******", true)
+    SriTextField("", {}, "Clave", "******", true, isLogin = true)
 }
 
 @Preview(showBackground = true)
 @Composable
 fun SriTextFieldPreview() {
-    SriTextField("", {}, "Ruc / C.I. / Pasaporte", "", false)
+    SriTextField("", {}, "Ruc / C.I. / Pasaporte", "", false, isLogin = false)
 }
