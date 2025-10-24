@@ -4,5 +4,6 @@ import ec.gob.sri.movil.app.estadotributario.domain.models.EstadoTributarioDomai
 
 data class EstadoTributarioState(
     val ruc: String = "",
+    val isLoading: Boolean = false,
     val estadoTributario: EstadoTributarioDomain? = null
 )

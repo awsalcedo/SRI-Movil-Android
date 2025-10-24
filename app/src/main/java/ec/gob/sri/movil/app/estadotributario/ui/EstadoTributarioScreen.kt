@@ -7,11 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -89,16 +88,12 @@ fun EstadoTributarioContent(
         },
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
-
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(paddingValues)
+                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
         ) {
-
             SriTextField(
                 text = rucValue,
                 onValueChange = { rucValue = it },
@@ -117,11 +112,62 @@ fun EstadoTributarioContent(
             SriButton(
                 text = "Consultar",
                 onClick = {
-                    onAction(EstadoTributarioAction.onConsultaEstadoTributarioClick(rucValue))
+                    if (!state.isLoading) { //Evitar acciones concurrentes
+                        onAction(EstadoTributarioAction.onConsultaEstadoTributarioClick(rucValue))
+                    }
                 },
                 modifier = Modifier.fillMaxWidth()
             )
+
+            if (state.isLoading) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
         }
+
+
+        /*Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+
+            if (state.isLoading) {
+                CircularProgressIndicator()
+            } else {
+                SriTextField(
+                    text = rucValue,
+                    onValueChange = { rucValue = it },
+                    label = "RUC:",
+                    hint = "Ej: 1700000000001",
+                    isInputSecret = false,
+                    isLogin = false,
+                    keyboardActions = KeyboardActions(onAny = {
+                        focusManager.moveFocus(FocusDirection.Next)
+                    }),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.padding(10.0.dp))
+
+                SriButton(
+                    text = "Consultar",
+                    onClick = {
+                        onAction(EstadoTributarioAction.onConsultaEstadoTributarioClick(rucValue))
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }*/
     }
 }
 

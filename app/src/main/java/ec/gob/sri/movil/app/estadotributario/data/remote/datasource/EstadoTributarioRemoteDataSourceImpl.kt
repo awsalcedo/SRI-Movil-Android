@@ -1,16 +1,14 @@
 package ec.gob.sri.movil.app.estadotributario.data.remote.datasource
 
-import com.google.gson.JsonSyntaxException
-import ec.gob.sri.movil.app.estadotributario.data.common.mapHttpToNetworkError
 import ec.gob.sri.movil.app.estadotributario.data.common.errorBodyAsString
 import ec.gob.sri.movil.app.estadotributario.data.common.extractServerMessage
+import ec.gob.sri.movil.app.estadotributario.data.common.mapHttpToNetworkError
 import ec.gob.sri.movil.app.estadotributario.data.remote.dto.EstadoTributarioDto
 import ec.gob.sri.movil.app.estadotributario.data.remote.service.EstadoTributarioService
 import ec.gob.sri.movil.app.estadotributario.data.remote.util.DataError
 import ec.gob.sri.movil.app.estadotributario.data.remote.util.DataResult
 import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.SerializationException
-import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
