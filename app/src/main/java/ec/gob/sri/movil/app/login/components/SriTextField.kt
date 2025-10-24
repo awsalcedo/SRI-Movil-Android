@@ -34,14 +34,15 @@ import ec.gob.sri.movil.app.R
 
 @Composable
 fun SriTextField(
+    modifier: Modifier = Modifier,
     text: String,
     onValueChange: (String) -> Unit,
     label: String,
     hint: String,
     isInputSecret: Boolean,
+    isNumber: Boolean,
     isLogin: Boolean,
-    keyboardActions: KeyboardActions = KeyboardActions(),
-    modifier: Modifier = Modifier
+    keyboardActions: KeyboardActions = KeyboardActions()
 ) {
     //Para componentes autónomos donde nunca tenga un comportamiento diferente para el ícono de visibilidad,
     //Porque al final sólo queremos alternar la visibilidad cuando se presionamos en él, no es necesario usar un viewmodel
@@ -50,10 +51,6 @@ fun SriTextField(
     Column(
         modifier = modifier
     ) {
-        /*Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium
-        )*/
         Spacer(modifier = Modifier.height(6.dp))
         OutlinedTextField(
             value = text,
@@ -132,7 +129,7 @@ fun SriTextField(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Next
                 )
-            } else if (isLogin) {
+            } else if (isNumber) {
                 KeyboardOptions(
                     autoCorrectEnabled = false,
                     keyboardType = KeyboardType.Number,
@@ -154,11 +151,11 @@ fun SriTextField(
 @Preview(showBackground = true)
 @Composable
 fun SriTextFieldPasswordPreview() {
-    SriTextField("", {}, "Clave", "******", true, isLogin = true)
+    SriTextField(text = "", onValueChange = {}, label = "Clave", hint = "******", isInputSecret = true, isNumber = true, isLogin = true)
 }
 
 @Preview(showBackground = true)
 @Composable
 fun SriTextFieldPreview() {
-    SriTextField("", {}, "Ruc / C.I. / Pasaporte", "", false, isLogin = false)
+    SriTextField(text = "", onValueChange = {}, label = "Ruc / C.I. / Pasaporte", hint = "", isInputSecret = false, isNumber = true, isLogin = false)
 }

@@ -37,6 +37,7 @@ fun LoginFormSection(
             label = "RUC / C.I. / Pasaporte",
             hint = "Ruc, Cédula o Pasaporte",
             isInputSecret = false,
+            isNumber = false,
             isLogin = true,
             keyboardActions = KeyboardActions(onAny = {
                 focusManager.moveFocus(FocusDirection.Next)
@@ -50,6 +51,7 @@ fun LoginFormSection(
             label = "C.I. adicional",
             hint = "En caso de requerir",
             isInputSecret = false,
+            isNumber = true,
             isLogin = true,
             keyboardActions = KeyboardActions(onAny = {
                 focusManager.moveFocus(FocusDirection.Next)
@@ -63,6 +65,7 @@ fun LoginFormSection(
             label = "Clave",
             hint = "",
             isInputSecret = true,
+            isNumber = true,
             isLogin = true,
             keyboardActions = KeyboardActions(onAny = {
                 focusManager.clearFocus()

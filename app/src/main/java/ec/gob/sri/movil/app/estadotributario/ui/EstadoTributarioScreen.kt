@@ -23,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -100,9 +99,12 @@ fun EstadoTributarioContent(
                 label = "RUC:",
                 hint = "Ej: 1700000000001",
                 isInputSecret = false,
+                isNumber = true,
                 isLogin = false,
                 keyboardActions = KeyboardActions(onAny = {
-                    focusManager.moveFocus(FocusDirection.Next)
+                    focusManager.clearFocus()
+                    onAction(EstadoTributarioAction.onConsultaEstadoTributarioClick(rucValue))
+
                 }),
                 modifier = Modifier.fillMaxWidth()
             )

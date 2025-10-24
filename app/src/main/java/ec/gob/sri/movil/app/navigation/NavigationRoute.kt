@@ -12,6 +12,9 @@ object ConsultasScreen
 object EstadoTributarioScreen
 
 @Serializable
+object EstadoTributarioDetalleScreen
+
+@Serializable
 object MatriculacionVehicularScreen
 
 
@@ -24,6 +27,9 @@ sealed class NavigationRoute {
 
     @Serializable
     data object EstadoTributarioScreen: NavigationRoute()
+
+    @Serializable
+    data object EstadoTributarioDetalleScreen: NavigationRoute()
 
     @Serializable
     data object MatriculacionVehicularScreen: NavigationRoute()
