@@ -22,6 +22,7 @@ fun NavigationHost(
         loginScreen(navController = navController)
         consultasScreen(navController = navController)
         estadoTributarioScreen(navController = navController)
+        estadoTributarioDetalle(navController = navController)
     }
 }
 

@@ -45,6 +45,7 @@ class EstadoTributarioViewModel @Inject constructor(private val estadoTributario
                     _state.update {
                         it.copy(estadoTributario = result.data, isLoading = false)
                     }
+                    eventChannel.send(EstadoTributarioEvent.OnNavigateDetail(estadoTributario = result.data))
                 }
             }
         }

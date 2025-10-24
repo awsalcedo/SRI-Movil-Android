@@ -49,6 +49,9 @@ fun EstadoTributarioScreen(
             is EstadoTributarioEvent.OnError -> {
                 snackbarState.showSnackbar(event.errorMessage)
             }
+            is EstadoTributarioEvent.OnNavigateDetail -> {
+
+            }
         }
     }
 
