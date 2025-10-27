@@ -19,13 +19,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-
-    val json = Json {
-        ignoreUnknownKeys = true
-        isLenient = true
-        coerceInputValues = true
-    }
-
     @Provides
     @Singleton
     @Named("BaseUrl")
@@ -38,9 +31,20 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun providesJson(): Json {
+        return Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+            coerceInputValues = true
+        }
+    }
+
+    @Provides
+    @Singleton
     fun provideRetrofit(
         @Named("BaseUrl") baseUrl: String,
         @Named("ContextApi") contextApi: String,
+        json: Json,
         okHttpClient: OkHttpClient
     ): Retrofit =
         Retrofit.Builder()
