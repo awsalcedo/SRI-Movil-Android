@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import ec.gob.sri.movil.app.consultas.ui.ConsultasScreen
 import ec.gob.sri.movil.app.estadotributario.ui.EstadoTributarioScreen
 import ec.gob.sri.movil.app.estadotributario.ui.detalle.EstadoTributarioDetalleScreen
@@ -45,7 +46,8 @@ fun NavGraphBuilder.estadoTributarioScreen(navController: NavHostController) {
 }
 
 fun NavGraphBuilder.estadoTributarioDetalle(navController: NavHostController) {
-    composable<NavigationRoute.EstadoTributarioDetalleScreen> {
-        EstadoTributarioDetalleScreen()
+    composable<NavigationRoute.EstadoTributarioDetalleScreen> { backStateEntry ->
+        val args = backStateEntry.toRoute<NavigationRoute.EstadoTributarioDetalleScreen>()
+        EstadoTributarioDetalleScreen(estadoTributario = args.estadoTributario)
     }
 }

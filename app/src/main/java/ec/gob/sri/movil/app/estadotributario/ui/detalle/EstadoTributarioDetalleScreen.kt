@@ -14,10 +14,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import ec.gob.sri.movil.app.estadotributario.domain.models.EstadoTributarioDomain
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EstadoTributarioDetalleScreen() {
+fun EstadoTributarioDetalleScreen(estadoTributario: String) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -27,11 +28,13 @@ fun EstadoTributarioDetalleScreen() {
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(paddingValues),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text("detalle  esatado tributario")
+            Text("detalle  estado tributario: $estadoTributario")
         }
     }
 }
@@ -39,7 +42,15 @@ fun EstadoTributarioDetalleScreen() {
 @Preview(showBackground = true, widthDp = 360)
 @Composable
 fun EstadoTributarioDetalleScreenPreview() {
+    val estadoTributario = EstadoTributarioDomain(
+        ruc = "1712245974001",
+        razonSocial = "SALCEDO SILVA ALEX WLADIMIR",
+        descripcion = "AL DIA EN SUS OBLIGACIONES",
+        plazoVigenciaDoc = "0 meses",
+        claseContribuyente = "Otro",
+        obligacionesPendientes = emptyList()
+    )
     MaterialTheme(colorScheme = lightColorScheme()) {
-        EstadoTributarioDetalleScreen()
+        EstadoTributarioDetalleScreen(estadoTributario = "AL DIA EN SUS OBLIGACIONES")
     }
 }
