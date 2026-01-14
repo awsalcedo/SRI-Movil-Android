@@ -13,9 +13,9 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ec.gob.sri.movil.app.login.components.SriButton
-import ec.gob.sri.movil.app.login.components.SriLink
-import ec.gob.sri.movil.app.login.components.SriTextField
+import ec.gob.sri.movil.common.framework.ui.components.SriButton
+import ec.gob.sri.movil.common.framework.ui.components.SriLink
+import ec.gob.sri.movil.common.framework.ui.components.SriTextField
 
 @Composable
 fun LoginFormSection(

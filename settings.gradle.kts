@@ -21,4 +21,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "SRI Movil Android"
 include(":app")
- 
+include(":common:domain")
+include(":common:data")
+include(":common:framework")
+include(":feature:estado_tributario")
