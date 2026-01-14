@@ -1,4 +1,4 @@
-package ec.gob.sri.movil.feature.estadotributario.ui.detalle
+package ec.gob.sri.movil.app.estadotributario.ui.detalle
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,9 +18,7 @@ import ec.gob.sri.movil.app.estadotributario.domain.models.EstadoTributarioDomai
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EstadoTributarioDetalleScreen(
-    estadoTributario: EstadoTributarioDomain
-) {
+fun EstadoTributarioDetalleScreen(estadoTributario: String) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -30,11 +28,13 @@ fun EstadoTributarioDetalleScreen(
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(paddingValues),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(estadoTributario.descripcion)
+            Text("detalle  estado tributario: $estadoTributario")
         }
     }
 }
@@ -42,16 +42,15 @@ fun EstadoTributarioDetalleScreen(
 @Preview(showBackground = true, widthDp = 360)
 @Composable
 fun EstadoTributarioDetalleScreenPreview() {
+    val estadoTributario = EstadoTributarioDomain(
+        ruc = "1712245974001",
+        razonSocial = "SALCEDO SILVA ALEX WLADIMIR",
+        descripcion = "AL DIA EN SUS OBLIGACIONES",
+        plazoVigenciaDoc = "0 meses",
+        claseContribuyente = "Otro",
+        obligacionesPendientes = emptyList()
+    )
     MaterialTheme(colorScheme = lightColorScheme()) {
-        EstadoTributarioDetalleScreen(
-            estadoTributario = EstadoTributarioDomain(
-                ruc = "1234567890",
-                razonSocial = "Empresa Ejemplo",
-                descripcion = "Alex Salcedo",
-                plazoVigenciaDoc = "2023-12-31",
-                claseContribuyente = "Clase A",
-                obligacionesPendientes = emptyList()
-            )
-        )
+        EstadoTributarioDetalleScreen(estadoTributario = "AL DIA EN SUS OBLIGACIONES")
     }
 }
