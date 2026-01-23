@@ -61,9 +61,15 @@ dependencies {
     implementation(libs.androidx.appcompat)
     //implementation(libs.material)
 
+    // Retrofit
+    implementation(libs.retrofit)
+
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+
+    // Para hiltViewModel() en Compose
+    implementation(libs.androidx.hilt.navigation.compose)
 
 
     testImplementation(libs.junit)

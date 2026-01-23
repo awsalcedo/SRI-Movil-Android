@@ -1,6 +1,6 @@
 package ec.gob.sri.movil.feature.estadotributario.data.remote.service
 
-import ec.gob.sri.movil.app.estadotributario.data.remote.dto.EstadoTributarioDto
+import ec.gob.sri.movil.feature.estadotributario.data.remote.dto.EstadoTributarioDto
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

@@ -29,9 +29,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import ec.gob.sri.movil.app.core.ui.util.ObserveAsEvents
-import ec.gob.sri.movil.app.login.components.SriButton
-import ec.gob.sri.movil.app.login.components.SriTextField
+import ec.gob.sri.movil.common.framework.ui.components.SriButton
+import ec.gob.sri.movil.common.framework.ui.components.SriTextField
+import ec.gob.sri.movil.common.framework.ui.text.asString
+import ec.gob.sri.movil.common.framework.ui.util.ObserveAsEvents
 import ec.gob.sri.movil.feature.estadotributario.domain.models.EstadoTributarioDomain
 
 @Composable
@@ -49,7 +50,7 @@ fun EstadoTributarioScreen(
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             is EstadoTributarioEvent.OnError -> {
-                snackbarState.showSnackbar(event.errorMessage)
+                snackbarState.showSnackbar(event.message.asString())
             }
 
             is EstadoTributarioEvent.OnNavigateDetail -> {
@@ -73,8 +74,8 @@ fun EstadoTributarioContent(
     onAction: (EstadoTributarioAction) -> Unit
 ) {
 
-    var rucValue by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
+    val showRucError = state.ruc.isNotBlank() && !state.isRucValid
 
     Scaffold(
         topBar = {
@@ -100,29 +101,46 @@ fun EstadoTributarioContent(
                 .padding(top = 16.dp, start = 16.dp, end = 16.dp)
         ) {
             SriTextField(
-                text = rucValue,
-                onValueChange = { rucValue = it },
+                text = state.ruc,
+                onValueChange = { onAction(EstadoTributarioAction.onRucChanged(it)) },
                 label = "RUC:",
                 hint = "Ej: 1700000000001",
                 isInputSecret = false,
                 isNumber = true,
                 isLogin = false,
-                keyboardActions = KeyboardActions(onAny = {
-                    focusManager.clearFocus()
-                    onAction(EstadoTributarioAction.onConsultaEstadoTributarioClick(rucValue))
+                isError = showRucError,
+                supportingText = if (showRucError) "Este campo debe contener como mínimo 13 caracteres." else null,
+                showClearIcon = true,
+                onClear = {
+                    onAction(EstadoTributarioAction.onRucChanged(""))
+                },
 
+                keyboardActions = KeyboardActions(onDone = {
+                    focusManager.clearFocus()
+                    if (state.isConsultarEnabled) {
+                        onAction(EstadoTributarioAction.OnConsultarClick)
+                    }
                 }),
                 modifier = Modifier.fillMaxWidth()
             )
 
+            if (showRucError) {
+                Text(
+                    text = "RUC inválido",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+            }
+
             Spacer(modifier = Modifier.padding(10.0.dp))
 
             SriButton(
-                text = "Consultar",
+                text = if (state.isLoading) "Consultando..." else "Consultar",
+                enabled = state.isConsultarEnabled,
+                isLoading = state.isLoading,
                 onClick = {
-                    if (!state.isLoading) { //Evitar acciones concurrentes
-                        onAction(EstadoTributarioAction.onConsultaEstadoTributarioClick(rucValue))
-                    }
+                    onAction(EstadoTributarioAction.OnConsultarClick)
                 },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -139,43 +157,6 @@ fun EstadoTributarioContent(
                 }
             }
         }
-
-
-        /*Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-
-            if (state.isLoading) {
-                CircularProgressIndicator()
-            } else {
-                SriTextField(
-                    text = rucValue,
-                    onValueChange = { rucValue = it },
-                    label = "RUC:",
-                    hint = "Ej: 1700000000001",
-                    isInputSecret = false,
-                    isLogin = false,
-                    keyboardActions = KeyboardActions(onAny = {
-                        focusManager.moveFocus(FocusDirection.Next)
-                    }),
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.padding(10.0.dp))
-
-                SriButton(
-                    text = "Consultar",
-                    onClick = {
-                        onAction(EstadoTributarioAction.onConsultaEstadoTributarioClick(rucValue))
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }*/
     }
 }
 

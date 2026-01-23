@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- NETWORK -->
+    <string name="error_no_internet">
+    No tienes conexión a internet. Revisa tu red e inténtalo nuevamente.
+</string>
+
+    <string name="error_timeout">
+    La solicitud está tardando más de lo esperado. Inténtalo otra vez.
+</string>
+
+    <string name="error_unavailable">
+    El servicio no está disponible en este momento. Por favor, intenta más tarde.
+</string>
+
+    <!-- AUTH / PERMISSIONS -->
+    <string name="error_unauthorized">
+    Tu sesión ha expirado. Inicia sesión nuevamente para continuar.
+</string>
+
+    <string name="error_forbidden">
+    No tienes permisos para realizar esta acción.
+</string>
+
+    <!-- DATA -->
+    <string name="error_not_found">
+    No se encontró información para los datos ingresados.
+</string>
+
+    <string name="error_too_many_requests">
+    Has realizado demasiadas solicitudes. Espera un momento e inténtalo de nuevo.
+</string>
+
+    <string name="error_serialization">
+    Ocurrió un problema al procesar la información. Inténtalo nuevamente.
+</string>
+
+    <!-- SERVER -->
+    <string name="error_server">
+    Ocurrió un error en el servidor. Por favor, intenta más tarde.
+</string>
+
+    <string name="error_client">
+    Ocurrió un error al procesar la solicitud. Verifica los datos ingresados.
+</string>
+
+    <!-- FALLBACK -->
+    <string name="error_unknown">
+    Ocurrió un error inesperado. Inténtalo nuevamente.
+</string>
+
+    <!-- LOCAL -->
+    <string name="error_local">
+    No se pudo completar la acción en este momento. Inténtalo nuevamente.
+</string>
+
+</resources>

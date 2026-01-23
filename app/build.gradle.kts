@@ -80,9 +80,12 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature:estado_tributario"))
-    implementation(project(":common:framework"))
+
     implementation(project(":common:data"))
+    implementation(project(":common:domain"))
+    implementation(project(":common:framework"))
+    implementation(project(":feature:estado_tributario"))
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

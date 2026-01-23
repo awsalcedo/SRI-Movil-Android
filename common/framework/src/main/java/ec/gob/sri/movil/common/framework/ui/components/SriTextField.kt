@@ -30,7 +30,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ec.gob.sri.movil.app.R
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+
 
 @Composable
 fun SriTextField(
@@ -42,7 +46,13 @@ fun SriTextField(
     isInputSecret: Boolean,
     isNumber: Boolean,
     isLogin: Boolean,
-    keyboardActions: KeyboardActions = KeyboardActions()
+    keyboardActions: KeyboardActions = KeyboardActions(),
+    // Soporte de error
+    isError: Boolean = false,
+    supportingText: String? = null,
+    // Icono de limpiar
+    showClearIcon: Boolean = false,
+    onClear: (() -> Unit)? = null,
 ) {
     //Para componentes autónomos donde nunca tenga un comportamiento diferente para el ícono de visibilidad,
     //Porque al final sólo queremos alternar la visibilidad cuando se presionamos en él, no es necesario usar un viewmodel
@@ -67,7 +77,10 @@ fun SriTextField(
                     unfocusedBorderColor = Color.White.copy(alpha = 0.90f),
                     focusedTextColor = Color.White,
                     unfocusedTextColor = Color.White.copy(alpha = 0.90f),
-                    cursorColor = Color.White.copy(alpha = 0.90f)
+                    cursorColor = Color.White.copy(alpha = 0.90f),
+                    errorBorderColor = MaterialTheme.colorScheme.error,
+                    errorCursorColor = MaterialTheme.colorScheme.error,
+                    errorLabelColor = MaterialTheme.colorScheme.error,
                 )
             } else {
                 OutlinedTextFieldDefaults.colors(
@@ -75,7 +88,10 @@ fun SriTextField(
                     unfocusedBorderColor = Color.Black.copy(alpha = 0.90f),
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black.copy(alpha = 0.90f),
-                    cursorColor = Color.Black.copy(alpha = 0.90f)
+                    cursorColor = Color.Black.copy(alpha = 0.90f),
+                    errorBorderColor = MaterialTheme.colorScheme.error,
+                    errorCursorColor = MaterialTheme.colorScheme.error,
+                    errorLabelColor = MaterialTheme.colorScheme.error,
                 )
             },
             label = {
@@ -95,52 +111,69 @@ fun SriTextField(
             textStyle = MaterialTheme.typography.bodyLarge,
             shape = RoundedCornerShape(10.dp),
             trailingIcon = {
-                if (isInputSecret) {
-                    IconButton(
-                        colors = IconButtonDefaults.iconButtonColors(
-                            contentColor = Color.White.copy(alpha = 0.90f)
-                        ),
-                        onClick = {
-                            isPasswordVisible = !isPasswordVisible
+                when {
+                    // Password toggle
+                    isInputSecret -> {
+                        IconButton(
+                            colors = IconButtonDefaults.iconButtonColors(
+                                contentColor = Color.White.copy(alpha = 0.90f)
+                            ),
+                            onClick = {
+                                isPasswordVisible = !isPasswordVisible
+                            }
+                        ) {
+                            Icon(
+                                imageVector = if (isPasswordVisible) {
+                                    Icons.Filled.VisibilityOff
+                                } else {
+                                    Icons.Filled.Visibility
+                                },
+                                contentDescription = if (isPasswordVisible) {
+                                    "Ocultar contraseña"
+                                } else {
+                                    "Mostrar contraseña"
+                                }
+                            )
                         }
-                    ) {
-                        when {
-                            isPasswordVisible -> {
-                                Icon(
-                                    painter = painterResource(R.drawable.visibility_off),
-                                    contentDescription = "Ocultar password"
-                                )
-                            }
-
-                            !isPasswordVisible -> {
-                                Icon(
-                                    painter = painterResource(R.drawable.visibility),
-                                    contentDescription = "Mostrar password"
-                                )
-                            }
+                    }
+                    // Icono limpiar
+                    showClearIcon && text.isNotBlank() -> {
+                        IconButton(onClick = { onClear?.invoke() }) {
+                            // si quieres usar tu propio ícono:
+                            // Icon(painterResource(R.drawable.ic_clear), contentDescription = "Limpiar")
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Limpiar"
+                            )
                         }
                     }
                 }
 
             },
-            keyboardOptions = if (isInputSecret) {
-                KeyboardOptions(
-                    autoCorrectEnabled = false,
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Next
-                )
-            } else if (isNumber) {
-                KeyboardOptions(
-                    autoCorrectEnabled = false,
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Next
-                )
-            } else {
-                KeyboardOptions(
-                    autoCorrectEnabled = false,
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
-                )
+            keyboardOptions = when {
+                isInputSecret -> {
+                    KeyboardOptions(
+                        autoCorrectEnabled = false,
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Next
+                    )
+                }
+
+                isNumber -> {
+                    KeyboardOptions(
+                        autoCorrectEnabled = false,
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    )
+                }
+
+                else -> {
+                    KeyboardOptions(
+                        autoCorrectEnabled = false,
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Done
+                    )
+                }
             },
             keyboardActions = keyboardActions,
             singleLine = true
@@ -151,11 +184,49 @@ fun SriTextField(
 @Preview(showBackground = true)
 @Composable
 fun SriTextFieldPasswordPreview() {
-    SriTextField(text = "", onValueChange = {}, label = "Clave", hint = "******", isInputSecret = true, isNumber = true, isLogin = true)
+    SriTextField(
+        text = "",
+        onValueChange = {},
+        label = "Clave",
+        hint = "******",
+        isInputSecret = true,
+        isNumber = true,
+        isLogin = true,
+        isError = false,
+        supportingText = null,
+        showClearIcon = false,
+        onClear = {},
+    )
 }
 
 @Preview(showBackground = true)
 @Composable
 fun SriTextFieldPreview() {
-    SriTextField(text = "", onValueChange = {}, label = "Ruc / C.I. / Pasaporte", hint = "", isInputSecret = false, isNumber = true, isLogin = false)
+    SriTextField(
+        text = "",
+        onValueChange = {},
+        label = "Ruc / C.I. / Pasaporte",
+        hint = "",
+        isInputSecret = false,
+        isNumber = true,
+        isLogin = false
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SriTextFieldErrorPreview() {
+    SriTextField(
+        text = "1234567890",
+        onValueChange = {},
+        label = "Ruc / C.I. / Pasaporte",
+        hint = "",
+        isInputSecret = false,
+        isNumber = true,
+        isLogin = false,
+        isError = true,
+        supportingText = "Error en el campo",
+        showClearIcon = true,
+        onClear = {}
+    )
 }

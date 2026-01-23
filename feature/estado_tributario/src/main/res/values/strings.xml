@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ruc_invalido">La identificación ingresada no se encuentra registrada en nuestra base de datos, verifique y vuelva a intentar.</string>
+</resources>
