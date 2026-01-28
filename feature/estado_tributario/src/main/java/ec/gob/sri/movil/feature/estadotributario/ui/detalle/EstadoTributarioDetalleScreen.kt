@@ -1,25 +1,36 @@
 package ec.gob.sri.movil.app.estadotributario.ui.detalle
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ListAlt
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -31,6 +42,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -41,6 +53,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,12 +67,8 @@ import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDeta
 import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDetalleViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Surface
+import androidx.compose.ui.semantics.Role
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,6 +85,16 @@ fun EstadoTributarioDetalleScreen(
     val context = LocalContext.current
 
     val initialRuc = remember { ruc }
+
+    val sheetScope = rememberCoroutineScope()
+
+    // Para animar el BottomSheet
+    LaunchedEffect(state.obligacionSeleccionada) {
+        runCatching {
+            if (state.obligacionSeleccionada != null) sheetState.show()
+            else sheetState.hide()
+        }
+    }
 
     // Iniciar la carga de datos
     LaunchedEffect(key1 = Unit) {
@@ -101,7 +120,12 @@ fun EstadoTributarioDetalleScreen(
         ObligacionPeriodosSheet(
             sheetState = sheetState,
             obligacion = obligacion,
-            onDismiss = viewModel::onDismissObligacion
+            onDismiss = {
+                sheetScope.launch {
+                    sheetState.hide()
+                    viewModel.onDismissObligacion()
+                }
+            }
         )
 
     }
@@ -112,8 +136,8 @@ fun EstadoTributarioDetalleScreen(
                 title = {
                     Text(
                         "Detalle Estado Tributario",
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.titleLarge,
+                        maxLines = 1
                     )
                 },
                 navigationIcon = {
@@ -125,7 +149,7 @@ fun EstadoTributarioDetalleScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface, // O .primary si se prefiere
+                    containerColor = MaterialTheme.colorScheme.surface,
                 )
             )
         },
@@ -163,9 +187,10 @@ fun EstadoTributarioDetalleContent(
         item {
             Text(
                 text = contribuyente.razonSocial,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 2
             )
             Spacer(modifier = Modifier.height(4.dp))
             HorizontalDivider()
@@ -180,16 +205,75 @@ fun EstadoTributarioDetalleContent(
                     onObligacionClick
                 )
             }
+        } else {
+            item {
+                EmptyObligationsCard(
+                    descripcion = contribuyente.descripcion
+                )
+            }
+        }
+
+    }
+}
+
+@Composable
+private fun EmptyObligationsCard(
+    descripcion: String
+) {
+    val isAlDia = descripcion.contains("AL DIA", ignoreCase = true)
+
+    val icon = if (isAlDia) Icons.Default.CheckCircle else Icons.Default.Warning
+    val tonalColor =
+        if (isAlDia) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Surface(
+                color = tonalColor.copy(alpha = 0.12f),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = tonalColor,
+                    modifier = Modifier.padding(10.dp).size(18.dp)
+                )
+            }
+
+            Spacer(Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Obligaciones pendientes",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = "No hay obligaciones pendientes para mostrar.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }
+
 
 @Composable
 fun GeneralInfoCard(info: EstadoTributarioDomain) {
     val isAlDia = info.descripcion.contains("AL DIA", ignoreCase = true)
 
     val statusIcon = if (isAlDia) Icons.Default.CheckCircle else Icons.Default.Warning
-    val statusColor = if (isAlDia) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+    val statusColor =
+        if (isAlDia) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -282,43 +366,125 @@ private fun ObligationsCard(
     obligaciones: List<ObligacionesPendientesDomain>,
     onObligacionClick: (ObligacionesPendientesDomain) -> Unit
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column {
-            ListItem(
-                headlineContent = { Text("Obligaciones Pendientes", fontWeight = FontWeight.Bold) },
-                leadingContent = {
+    val totalPeriodos = obligaciones.sumOf { it.periodos.size }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+
+            // Header tipo "section" (M3)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Surface(
+                    color = MaterialTheme.colorScheme.error.copy(alpha = 0.12f),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
                     Icon(
-                        Icons.Default.Warning,
+                        imageVector = Icons.Default.Warning,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error
+                        tint = MaterialTheme.colorScheme.error.copy(alpha = 0.9f),
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .size(18.dp)
                     )
                 }
-            )
-            HorizontalDivider()
+
+                Spacer(Modifier.width(12.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Obligaciones pendientes",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = "${obligaciones.size} obligaciones • $totalPeriodos periodos",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(12.dp))
+
             obligaciones.forEachIndexed { index, obligacion ->
-                ListItem(
-                    modifier = Modifier.clickable { onObligacionClick(obligacion) },
-                    headlineContent = {
-                        Text(
-                            obligacion.descripcion,
-                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium)
-                        )
-                    },
-                    supportingContent = { Text("${obligacion.periodos.size} periodos pendientes") },
-                    trailingContent = {
-                        Icon(
-                            Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                            contentDescription = "Ver detalle"
-                        )
-                    }
+                ObligacionRow(
+                    obligacion = obligacion,
+                    onClick = { onObligacionClick(obligacion) }
                 )
-                if (index < obligaciones.size - 1) {
-                    HorizontalDivider(modifier = Modifier.padding(start = 16.dp))
+
+                if (index < obligaciones.lastIndex) {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 10.dp),
+                        thickness = DividerDefaults.Thickness,
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
+                    )
                 }
             }
         }
     }
 }
+
+@Composable
+private fun ObligacionRow(
+    obligacion: ObligacionesPendientesDomain,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .clickable(
+                role = Role.Button,
+                onClick = onClick
+            )
+            .padding(horizontal = 4.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Surface(
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.ListAlt,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(18.dp)
+            )
+        }
+
+        Spacer(Modifier.width(12.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = obligacion.descripcion,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+                maxLines = 2
+            )
+            Text(
+                text = "${obligacion.periodos.size} periodos pendientes",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -331,22 +497,30 @@ private fun ObligacionPeriodosSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
     ) {
-        Column(modifier = Modifier.navigationBarsPadding()) {
+        Column(
+            modifier = Modifier
+                .navigationBarsPadding()
+                .animateContentSize(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                )
+        ) {
             Text(
                 text = obligacion.descripcion,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(horizontal = 16.dp),
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
             Text(
-                text = "${obligacion.periodos.size} PERIODOS PENDIENTES",
-                style = MaterialTheme.typography.labelMedium,
+                text = "${obligacion.periodos.size} Periodos Pendientes",
+                style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 16.dp)
             )
             HorizontalDivider()
+
             LazyColumn(contentPadding = PaddingValues(bottom = 32.dp)) {
-                // Ahora podemos iterar sobre `obligacion.periodos` de forma segura.
                 items(obligacion.periodos) { periodo ->
                     ListItem(headlineContent = { Text(text = periodo) })
                 }
@@ -354,6 +528,7 @@ private fun ObligacionPeriodosSheet(
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, name = "Pantalla Detalle con Obligaciones", widthDp = 360)
@@ -389,7 +564,7 @@ fun EstadoTributarioDetalleScreenPreview_ConObligaciones() {
             Box(Modifier.padding(padding)) {
                 EstadoTributarioDetalleContent(
                     contribuyente = contribuyenteConObligaciones,
-                    onObligacionClick = {} // En preview, la acción no hace nada
+                    onObligacionClick = {}
                 )
             }
         }
@@ -403,8 +578,8 @@ fun EstadoTributarioDetalleScreenPreview_SinObligaciones() {
     val contribuyenteConObligaciones = EstadoTributarioDomain(
         ruc = "1314411206001",
         razonSocial = "ESPINALES GARCIA MARCOS RENATO",
-        descripcion = "OBLIGACIONES PENDIENTES",
-        plazoVigenciaDoc = "3 meses",
+        descripcion = "AL DIA EN SUS OBLIGACIONES",
+        plazoVigenciaDoc = "12 meses",
         claseContribuyente = "Otro",
         obligacionesPendientes = emptyList()
     )
