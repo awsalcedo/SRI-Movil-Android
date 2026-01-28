@@ -16,5 +16,5 @@ data class EstadoTributarioDto(
     @SerialName("claseContribuyente")
     val claseContribuyente: String,
     @SerialName("obligacionesPendientes")
-    val obligacionesPendientes: List<ObligacionesPendientesDto>
+    val obligacionesPendientes: List<ObligacionesPendientesDto>? = null
 )

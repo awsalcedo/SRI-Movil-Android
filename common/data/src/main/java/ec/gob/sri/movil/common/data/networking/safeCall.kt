@@ -98,6 +98,7 @@ inline fun <reified T> responseToResult(
         null
     }
 
-    return DataResult.Error(httpErrorMapper.map(code, errorBody))
+    val normalized = normalizeErrorBody(errorBody)
+    return DataResult.Error(httpErrorMapper.map(code, normalized))
 }
 

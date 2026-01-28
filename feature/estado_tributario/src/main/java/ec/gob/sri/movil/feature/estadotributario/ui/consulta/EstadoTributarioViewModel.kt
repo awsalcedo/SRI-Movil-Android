@@ -1,4 +1,4 @@
-package ec.gob.sri.movil.feature.estadotributario.ui
+package ec.gob.sri.movil.feature.estadotributario.ui.consulta
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -54,7 +54,7 @@ class EstadoTributarioViewModel @Inject constructor(
         if (!currentState.isRucValid) {
             viewModelScope.launch {
                 eventChannel.send(
-                    EstadoTributarioEvent.OnError(UiText.Res(R.string.ruc_invalido))
+                    EstadoTributarioEvent.OnError(UiText.StringResource(R.string.ruc_invalido))
                 )
             }
             return

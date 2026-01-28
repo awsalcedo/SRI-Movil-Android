@@ -8,5 +8,5 @@ data class ObligacionesPendientesDto(
     @SerialName("descripcion")
     val descripcion: String,
     @SerialName("periodos")
-    val periodos: List<String>? = emptyList()
+    val periodos: List<String> = emptyList()
 )

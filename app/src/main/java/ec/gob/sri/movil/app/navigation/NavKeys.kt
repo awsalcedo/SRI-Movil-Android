@@ -4,19 +4,19 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class NavigationRoute: NavKey {
+sealed class NavigationRoute : NavKey {
     @Serializable
-    data object LoginScreen: NavigationRoute()
+    data object LoginScreen : NavigationRoute()
 
     @Serializable
-    data object ConsultasScreen: NavigationRoute()
+    data object ConsultasScreen : NavigationRoute()
 
     @Serializable
-    data object EstadoTributarioScreen: NavigationRoute()
+    data object EstadoTributarioScreen : NavigationRoute()
 
     @Serializable
-    data object EstadoTributarioDetalleScreen: NavigationRoute()
+    data class EstadoTributarioDetalleScreen(val ruc: String) : NavigationRoute()
 
     @Serializable
-    data object MatriculacionVehicularScreen: NavigationRoute()
+    data object MatriculacionVehicularScreen : NavigationRoute()
 }

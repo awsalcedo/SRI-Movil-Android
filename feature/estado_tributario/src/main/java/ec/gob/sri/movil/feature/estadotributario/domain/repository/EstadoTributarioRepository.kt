@@ -6,4 +6,5 @@ import ec.gob.sri.movil.feature.estadotributario.domain.models.EstadoTributarioD
 
 interface EstadoTributarioRepository {
     suspend fun consultarEstadoTributario(ruc: String): DataResult<EstadoTributarioDomain, AppError>
+    fun getCachedEstadoTributario(ruc: String): EstadoTributarioDomain?
 }

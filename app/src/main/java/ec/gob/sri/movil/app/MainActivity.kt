@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import ec.gob.sri.movil.app.navigation.NavigationRoute
 import ec.gob.sri.movil.app.navigation.AppNavigation
 import ec.gob.sri.movil.app.ui.theme.SRIMovilAndroidTheme
 
@@ -25,11 +23,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val navController = rememberNavController()
-                    AppNavigation(
-                        navController = navController,
-                        startDestination = NavigationRoute.EstadoTributarioScreen
-                    )
+                    AppNavigation()
                 }
             }
         }

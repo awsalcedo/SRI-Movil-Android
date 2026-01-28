@@ -1,6 +1,9 @@
 package ec.gob.sri.movil.common.framework.ui.text
 
+import android.content.Context
 import androidx.annotation.StringRes
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 
 /**
  * Abstracción de texto para UI que soporta:
@@ -13,17 +16,26 @@ import androidx.annotation.StringRes
  * - Devolver mensajes desde mappers/use cases sin acoplarse a Resources
  * - Renderizar el texto final en Compose con [asString]
  */
-sealed interface UiText {
-    /**
-     * Texto ya calculado (por ejemplo, un mensaje retornado por backend o compuesto en runtime).
-     */
-    data class Dynamic(val value: String) : UiText
 
-    /**
-     * Texto localizable usando un recurso de string.
-     *
-     * @param id id del string resource.
-     * @param args argumentos para formateo (string placeholders).
-     */
-    data class Res(@param:StringRes val id: Int, val args: List<Any> = emptyList()) : UiText
+sealed interface UiText {
+    data class DynamicString(val value: String): UiText
+    class StringResource(
+        @param:StringRes val id: Int,
+        val args: Array<Any> = arrayOf()
+    ): UiText
+
+    @Composable
+    fun asString(): String {
+        return when(this) {
+            is DynamicString -> value
+            is StringResource -> stringResource(id = id, *args)
+        }
+    }
+
+    fun asString(context: Context): String {
+        return when(this) {
+            is DynamicString -> value
+            is StringResource -> context.getString(id, *args)
+        }
+    }
 }

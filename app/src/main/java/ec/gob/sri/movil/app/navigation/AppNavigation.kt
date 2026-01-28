@@ -1,21 +1,17 @@
 package ec.gob.sri.movil.app.navigation
 
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import ec.gob.sri.movil.app.consultas.ui.ConsultasScreen
-import ec.gob.sri.movil.app.login.ui.LoginScreen
-import ec.gob.sri.movil.feature.estadotributario.domain.models.EstadoTributarioDomain
-import ec.gob.sri.movil.feature.estadotributario.ui.EstadoTributarioScreen
-import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDetalleScreen
+import ec.gob.sri.movil.app.estadotributario.ui.detalle.EstadoTributarioDetalleScreen
+import ec.gob.sri.movil.feature.estadotributario.ui.consulta.EstadoTributarioScreen
 
 @Composable
 fun AppNavigation() {
@@ -27,6 +23,24 @@ fun AppNavigation() {
         entryProvider = entryProvider {
             routeEstadoTributarioEntry(backStack)
             routeEstadoTributarioDetalleEntry(backStack)
+        },
+        transitionSpec = {
+            slideInHorizontally(
+                initialOffsetX = { it }
+            ) togetherWith
+                    slideOutHorizontally(targetOffsetX = { it })
+        },
+        popTransitionSpec = {
+            slideInHorizontally(
+                initialOffsetX = { -it }
+            ) togetherWith
+                    slideOutHorizontally(targetOffsetX = { it })
+        },
+        predictivePopTransitionSpec = {
+            slideInHorizontally(
+                initialOffsetX = { -it }
+            ) togetherWith
+                    slideOutHorizontally(targetOffsetX = { it })
         }
     )
 }
@@ -40,6 +54,20 @@ private fun EntryProviderScope<NavKey>.routeEstadoTributarioEntry(backStack: Nav
                     NavigationRoute.EstadoTributarioDetalleScreen(
                         it
                     )
+                )
+            }
+        )
+    }
+}
+
+@Composable
+private fun EntryProviderScope<NavKey>.routeEstadoTributarioDetalleEntry(backStack: NavBackStack<NavKey>) {
+    entry<NavigationRoute.EstadoTributarioDetalleScreen> {
+        EstadoTributarioDetalleScreen(
+            ruc = it.ruc,
+            onBack = {
+                backStack.navigateTo(
+                    NavigationRoute.EstadoTributarioScreen
                 )
             }
         )

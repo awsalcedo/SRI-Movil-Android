@@ -1,7 +1,7 @@
 package ec.gob.sri.movil.common.framework.ui.error
 
-import ec.gob.sri.movil.common.framework.R
 import ec.gob.sri.movil.common.domain.error.AppError
+import ec.gob.sri.movil.common.framework.R
 import ec.gob.sri.movil.common.framework.ui.text.UiText
 
 /**
@@ -21,47 +21,49 @@ fun AppError.toUiText(): UiText = when (this) {
 
     /* ========= NETWORK ========= */
     AppError.Network.NoInternet ->
-        UiText.Res(R.string.error_no_internet)
+        UiText.StringResource(R.string.error_no_internet)
 
     AppError.Network.Timeout ->
-        UiText.Res(R.string.error_timeout)
+        UiText.StringResource(R.string.error_timeout)
 
     AppError.Network.Unavailable ->
-        UiText.Res(R.string.error_unavailable)
+        UiText.StringResource(R.string.error_unavailable)
 
     /* ========= HTTP ========= */
     is AppError.Http.Unauthorized ->
-        UiText.Res(R.string.error_unauthorized)
+        UiText.StringResource(R.string.error_unauthorized)
 
     is AppError.Http.Forbidden ->
-        UiText.Res(R.string.error_forbidden)
+        UiText.StringResource(R.string.error_forbidden)
 
     is AppError.Http.NotFound ->
-        UiText.Res(R.string.error_not_found)
+        this.message?.takeIf { it.isNotBlank() }?.let { UiText.DynamicString(it) }
+            ?:UiText.StringResource(R.string.error_not_found)
 
     is AppError.Http.TooManyRequests ->
-        UiText.Res(R.string.error_too_many_requests)
+        UiText.StringResource(R.string.error_too_many_requests)
 
     is AppError.Http.Server ->
-        UiText.Res(R.string.error_server)
+        UiText.StringResource(R.string.error_server)
 
     is AppError.Http.Client ->
-        UiText.Res(R.string.error_client)
+        this.message?.takeIf { it.isNotBlank() }?.let { UiText.DynamicString(it) }
+            ?:UiText.StringResource(R.string.error_client)
 
     /* ========= AUTH ========= */
     is AppError.Auth ->
-        UiText.Res(R.string.error_unauthorized)
+        UiText.StringResource(R.string.error_unauthorized)
 
     /* ========= LOCAL ========= */
     is AppError.Local ->
-        UiText.Res(R.string.error_local)
+        UiText.StringResource(R.string.error_local)
 
     /* ========= SERIALIZATION ========= */
     AppError.Serialization ->
-        UiText.Res(R.string.error_serialization)
+        UiText.StringResource(R.string.error_serialization)
 
     /* ========= FALLBACK ========= */
     is AppError.Unknown ->
-        UiText.Res(R.string.error_unknown)
+        UiText.StringResource(R.string.error_unknown)
 
 }

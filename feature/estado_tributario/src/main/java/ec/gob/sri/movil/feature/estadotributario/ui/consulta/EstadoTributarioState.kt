@@ -1,4 +1,4 @@
-package ec.gob.sri.movil.feature.estadotributario.ui
+package ec.gob.sri.movil.feature.estadotributario.ui.consulta
 
 import ec.gob.sri.movil.feature.estadotributario.domain.models.EstadoTributarioDomain
 

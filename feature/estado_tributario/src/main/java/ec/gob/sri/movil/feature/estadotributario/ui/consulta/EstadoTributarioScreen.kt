@@ -1,4 +1,4 @@
-package ec.gob.sri.movil.feature.estadotributario.ui
+package ec.gob.sri.movil.feature.estadotributario.ui.consulta
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,11 +18,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,17 +30,16 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ec.gob.sri.movil.common.framework.ui.components.SriButton
 import ec.gob.sri.movil.common.framework.ui.components.SriTextField
-import ec.gob.sri.movil.common.framework.ui.text.asString
 import ec.gob.sri.movil.common.framework.ui.util.ObserveAsEvents
-import ec.gob.sri.movil.feature.estadotributario.domain.models.EstadoTributarioDomain
 
 @Composable
 fun EstadoTributarioScreen(
     viewModel: EstadoTributarioViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
-    onNavigateToDetail: (EstadoTributarioDomain) -> Unit
+    onNavigateToDetail: (String) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     val snackbarState = remember {
         SnackbarHostState()
@@ -50,11 +48,11 @@ fun EstadoTributarioScreen(
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             is EstadoTributarioEvent.OnError -> {
-                snackbarState.showSnackbar(event.message.asString())
+                snackbarState.showSnackbar(event.message.asString(context))
             }
 
             is EstadoTributarioEvent.OnNavigateDetail -> {
-                onNavigateToDetail(event.estadoTributario)
+                onNavigateToDetail(event.estadoTributario.ruc)
             }
         }
     }

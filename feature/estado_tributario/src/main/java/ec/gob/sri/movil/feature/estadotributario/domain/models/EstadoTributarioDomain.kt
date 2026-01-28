@@ -6,5 +6,5 @@ data class EstadoTributarioDomain(
     val descripcion: String,
     val plazoVigenciaDoc: String,
     val claseContribuyente: String,
-    val obligacionesPendientes: List<ObligacionesPendientesDomain>
+    val obligacionesPendientes: List<ObligacionesPendientesDomain> = emptyList()
 )

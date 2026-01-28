@@ -12,7 +12,7 @@ fun EstadoTributarioDto.toDomain(): EstadoTributarioDomain {
         descripcion = this.descripcion,
         plazoVigenciaDoc = this.plazoVigenciaDoc,
         claseContribuyente = this.claseContribuyente,
-        obligacionesPendientes = this.obligacionesPendientes.map { it.toDomain() }
+        obligacionesPendientes = this.obligacionesPendientes.orEmpty().map { it.toDomain() }
     )
 }
 
