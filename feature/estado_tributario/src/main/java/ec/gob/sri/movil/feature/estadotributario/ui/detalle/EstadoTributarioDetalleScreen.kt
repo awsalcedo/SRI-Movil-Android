@@ -10,21 +10,24 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.ListAlt
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -35,7 +38,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -55,11 +57,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ec.gob.sri.movil.common.framework.ui.theme.SRITheme
 import ec.gob.sri.movil.feature.estadotributario.domain.models.EstadoTributarioDomain
 import ec.gob.sri.movil.feature.estadotributario.domain.models.ObligacionesPendientesDomain
 import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDetalleAction
@@ -67,8 +72,6 @@ import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDeta
 import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDetalleViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.style.TextOverflow
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -155,6 +158,7 @@ fun EstadoTributarioDetalleScreen(
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        bottomBar = { EstadoTributarioFooterDisclaimer() },
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
         Box(
@@ -176,10 +180,39 @@ fun EstadoTributarioDetalleScreen(
 }
 
 @Composable
+private fun EstadoTributarioFooterDisclaimer() {
+    Surface(
+        tonalElevation = 0.dp,
+        shadowElevation = 0.dp,
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier
+            .fillMaxWidth()
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .padding(bottom = 4.dp)
+    ) {
+        Text(
+            text = "El tiempo reflejado en el Plazo de Vigencia de los Documentos, " +
+                    "corresponde al tiempo que tendrá vigencia los documentos impresos el día de hoy.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+
+@Composable
 fun EstadoTributarioDetalleContent(
     contribuyente: EstadoTributarioDomain,
     onObligacionClick: (ObligacionesPendientesDomain) -> Unit
 ) {
+    val isNoActivo = contribuyente.descripcion.contains("NO ACTIVO", ignoreCase = true)
+    val isAlDia = contribuyente.descripcion.contains("AL DÍA", ignoreCase = true)
+            || contribuyente.descripcion.contains("AL DÍA", ignoreCase = true)
+
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
@@ -190,7 +223,7 @@ fun EstadoTributarioDetalleContent(
                 text = contribuyente.razonSocial,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = MaterialTheme.colorScheme.primary,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 2
             )
@@ -200,21 +233,39 @@ fun EstadoTributarioDetalleContent(
 
         item { GeneralInfoCard(contribuyente) }
 
-        if (contribuyente.obligacionesPendientes.isNotEmpty()) {
-            item {
-                ObligationsCard(
-                    contribuyente.obligacionesPendientes,
-                    onObligacionClick
-                )
-            }
-        } else {
-            item {
-                EmptyObligationsCard(
-                    descripcion = contribuyente.descripcion
-                )
+        // NO ACTIVO: no mostrar segunda card
+        if (!isNoActivo) {
+
+            val obligaciones = contribuyente.obligacionesPendientes
+
+            when {
+                obligaciones == null -> {
+                    // Backend no envió el bloque => NO mostrar card (como app anterior)
+                }
+
+                obligaciones.isEmpty() -> {
+                    // Bloque existe pero viene vacío => mostrar empty state
+                    item { EmptyObligationsCard(descripcion = contribuyente.descripcion) }
+                }
+
+                else -> {
+                    item {
+                        // AL DÍA: mostrar card pero DESHABILITADA
+                        val enabled = !isAlDia
+
+                        ObligationsCard(
+                            obligaciones = obligaciones,
+                            enabled = enabled,
+                            onObligacionClick = { obligacion ->
+                                if (enabled && obligacion.periodos.isNotEmpty()) {
+                                    onObligacionClick(obligacion)
+                                }
+                            }
+                        )
+                    }
+                }
             }
         }
-
     }
 }
 
@@ -222,7 +273,7 @@ fun EstadoTributarioDetalleContent(
 private fun EmptyObligationsCard(
     descripcion: String
 ) {
-    val isAlDia = descripcion.contains("AL DIA", ignoreCase = true)
+    val isAlDia = descripcion.contains("AL DÍA", ignoreCase = true)
 
     val icon = if (isAlDia) Icons.Default.CheckCircle else Icons.Default.Warning
     val tonalColor =
@@ -246,7 +297,9 @@ private fun EmptyObligationsCard(
                     imageVector = icon,
                     contentDescription = null,
                     tint = tonalColor,
-                    modifier = Modifier.padding(10.dp).size(18.dp)
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .size(18.dp)
                 )
             }
 
@@ -259,7 +312,7 @@ private fun EmptyObligationsCard(
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = "No hay obligaciones pendientes para mostrar.",
+                    text = "Sin obligaciones tributarias.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -271,7 +324,7 @@ private fun EmptyObligationsCard(
 
 @Composable
 fun GeneralInfoCard(info: EstadoTributarioDomain) {
-    val isAlDia = info.descripcion.contains("AL DIA", ignoreCase = true)
+    val isAlDia = info.descripcion.contains("AL DÍA", ignoreCase = true)
 
     val statusIcon = if (isAlDia) Icons.Default.CheckCircle else Icons.Default.Warning
     val statusColor =
@@ -366,9 +419,16 @@ private fun InfoRow(
 @Composable
 private fun ObligationsCard(
     obligaciones: List<ObligacionesPendientesDomain>,
+    enabled: Boolean,
     onObligacionClick: (ObligacionesPendientesDomain) -> Unit
 ) {
     val totalPeriodos = obligaciones.sumOf { it.periodos.size }
+
+    // AL DÍA (enabled=false): icono check + color primary + título "Obligaciones"
+    val headerIcon = if (enabled) Icons.Default.Warning else Icons.Default.CheckCircle
+    val headerColor =
+        if (enabled) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+    val headerTitle = if (enabled) "Obligaciones pendientes" else "Obligaciones"
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -384,13 +444,13 @@ private fun ObligationsCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Surface(
-                    color = MaterialTheme.colorScheme.error.copy(alpha = 0.12f),
+                    color = headerColor.copy(alpha = 0.12f),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Warning,
+                        imageVector = headerIcon,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error.copy(alpha = 0.9f),
+                        tint = headerColor.copy(alpha = 0.9f),
                         modifier = Modifier
                             .padding(8.dp)
                             .size(18.dp)
@@ -401,7 +461,7 @@ private fun ObligationsCard(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Obligaciones pendientes",
+                        text = headerTitle,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -418,6 +478,7 @@ private fun ObligationsCard(
             obligaciones.forEachIndexed { index, obligacion ->
                 ObligacionRow(
                     obligacion = obligacion,
+                    enabled = enabled && obligacion.periodos.isNotEmpty(),
                     onClick = { onObligacionClick(obligacion) }
                 )
 
@@ -436,17 +497,26 @@ private fun ObligationsCard(
 @Composable
 private fun ObligacionRow(
     obligacion: ObligacionesPendientesDomain,
+    enabled: Boolean, // ✅ NUEVO
     onClick: () -> Unit
 ) {
+    val rowModifier = Modifier
+        .fillMaxWidth()
+        .clip(RoundedCornerShape(14.dp))
+        .then(
+            if (enabled) {
+                Modifier.clickable(
+                    role = Role.Button,
+                    onClick = onClick
+                )
+            } else {
+                Modifier // ✅ sin clickable = sin ripple + no abre sheet
+            }
+        )
+        .padding(horizontal = 4.dp, vertical = 10.dp)
+
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(14.dp))
-            .clickable(
-                role = Role.Button,
-                onClick = onClick
-            )
-            .padding(horizontal = 4.dp, vertical = 10.dp),
+        modifier = rowModifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Surface(
@@ -454,7 +524,7 @@ private fun ObligacionRow(
             shape = RoundedCornerShape(12.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.ListAlt,
+                imageVector = Icons.AutoMirrored.Filled.ListAlt,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
@@ -472,18 +542,29 @@ private fun ObligacionRow(
                 fontWeight = FontWeight.Medium,
                 maxLines = 2
             )
+
+            // Si está deshabilitado, mejor no insinuar “pendientes”
+            val supporting = if (enabled) {
+                "${obligacion.periodos.size} periodos pendientes"
+            } else {
+                "Sin periodos pendientes"
+            }
+
             Text(
-                text = "${obligacion.periodos.size} periodos pendientes",
+                text = supporting,
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        // ✅ Flecha solo si es interactivo
+        if (enabled) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 
@@ -522,20 +603,41 @@ private fun ObligacionPeriodosSheet(
             )
             HorizontalDivider()
 
-            LazyColumn(contentPadding = PaddingValues(bottom = 32.dp)) {
-                items(obligacion.periodos) { periodo ->
-                    ListItem(headlineContent = { Text(text = periodo) })
+            LazyColumn(
+                contentPadding = PaddingValues(bottom = 16.dp)
+            ) {
+                itemsIndexed(obligacion.periodos) { index, periodo ->
+                    PeriodoRowCompacto(text = periodo)
+
+                    if (index < obligacion.periodos.lastIndex) {
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+                        )
+                    }
                 }
             }
+
         }
     }
 }
 
+@Composable
+private fun PeriodoRowCompacto(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp), // Controla el “alto” aquí
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, name = "Pantalla Detalle con Obligaciones", widthDp = 360)
 @Composable
-fun EstadoTributarioDetalleScreenPreview_ConObligaciones() {
+fun EstadoTributarioDetalleLightScreenPreview_ActivoConObligaciones() {
     val contribuyenteConObligaciones = EstadoTributarioDomain(
         ruc = "1314411206001",
         razonSocial = "ESPINALES GARCIA MARCOS RENATO",
@@ -550,7 +652,7 @@ fun EstadoTributarioDetalleScreenPreview_ConObligaciones() {
             ObligacionesPendientesDomain("DECLARACIÓN DE IVA PAGO", listOf("OCTUBRE 2023"))
         )
     )
-    MaterialTheme {
+    SRITheme(darkTheme = false) {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
@@ -576,16 +678,174 @@ fun EstadoTributarioDetalleScreenPreview_ConObligaciones() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, name = "Pantalla Detalle con Obligaciones", widthDp = 360)
 @Composable
-fun EstadoTributarioDetalleScreenPreview_SinObligaciones() {
+fun EstadoTributarioDetalleDarkScreenPreview_ActivoConObligaciones() {
     val contribuyenteConObligaciones = EstadoTributarioDomain(
         ruc = "1314411206001",
         razonSocial = "ESPINALES GARCIA MARCOS RENATO",
+        descripcion = "OBLIGACIONES PENDIENTES",
+        plazoVigenciaDoc = "3 meses",
+        claseContribuyente = "Otro",
+        obligacionesPendientes = listOf(
+            ObligacionesPendientesDomain(
+                "DECLARACIÓN DE IVA",
+                listOf("AGOSTO 2023", "SEPTIEMBRE 2023")
+            ),
+            ObligacionesPendientesDomain("DECLARACIÓN DE IVA PAGO", listOf("OCTUBRE 2023"))
+        )
+    )
+    SRITheme(darkTheme = true) {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = { Text("Detalle Estado Tributario") },
+                    navigationIcon = {
+                        IconButton(onClick = {}) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                        }
+                    }
+                )
+            }
+        ) { padding ->
+            Box(Modifier.padding(padding)) {
+                EstadoTributarioDetalleContent(
+                    contribuyente = contribuyenteConObligaciones,
+                    onObligacionClick = {}
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, name = "Pantalla Detalle con Obligaciones", widthDp = 360)
+@Composable
+fun EstadoTributarioDetalleLightScreenPreview_ActivoSinObligaciones() {
+    val contribuyenteConObligaciones = EstadoTributarioDomain(
+        ruc = "1314411206001",
+        razonSocial = "SALCEDO SILVA ALEX WLADIMIR",
         descripcion = "AL DIA EN SUS OBLIGACIONES",
-        plazoVigenciaDoc = "12 meses",
+        plazoVigenciaDoc = "0 meses",
+        claseContribuyente = "Otro",
+        obligacionesPendientes = listOf(
+            ObligacionesPendientesDomain(
+                "SIN OBLIGACIONES TRIBUTARIAS",
+                emptyList()
+            ),
+            ObligacionesPendientesDomain("CONTRIBUYENTE NO ACTIVO", emptyList())
+        )
+    )
+    SRITheme(darkTheme = false) {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = { Text("Detalle Estado Tributario") },
+                    navigationIcon = {
+                        IconButton(onClick = {}) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                        }
+                    }
+                )
+            }
+        ) { padding ->
+            Box(Modifier.padding(padding)) {
+                EstadoTributarioDetalleContent(
+                    contribuyente = contribuyenteConObligaciones,
+                    onObligacionClick = {}
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, name = "Pantalla Detalle con Obligaciones", widthDp = 360)
+@Composable
+fun EstadoTributarioDetalleDarkScreenPreview_ActivoSinObligaciones() {
+    val contribuyenteConObligaciones = EstadoTributarioDomain(
+        ruc = "1314411206001",
+        razonSocial = "SALCEDO SILVA ALEX WLADIMIR",
+        descripcion = "AL DIA EN SUS OBLIGACIONES",
+        plazoVigenciaDoc = "0 meses",
+        claseContribuyente = "Otro",
+        obligacionesPendientes = listOf(
+            ObligacionesPendientesDomain(
+                "SIN OBLIGACIONES TRIBUTARIAS",
+                emptyList()
+            ),
+            ObligacionesPendientesDomain("CONTRIBUYENTE NO ACTIVO", emptyList())
+        )
+    )
+    SRITheme(darkTheme = true) {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = { Text("Detalle Estado Tributario") },
+                    navigationIcon = {
+                        IconButton(onClick = {}) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                        }
+                    }
+                )
+            }
+        ) { padding ->
+            Box(Modifier.padding(padding)) {
+                EstadoTributarioDetalleContent(
+                    contribuyente = contribuyenteConObligaciones,
+                    onObligacionClick = {}
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, name = "Pantalla Detalle con Obligaciones", widthDp = 360)
+@Composable
+fun EstadoTributarioDetalleLigthScreenPreview_Iactivo() {
+    val contribuyenteConObligaciones = EstadoTributarioDomain(
+        ruc = "1314411206001",
+        razonSocial = "MOREIRA TORRES YESSICA ELIZABETH",
+        descripcion = "CONTRIBUYENTE NO ACTIVO",
+        plazoVigenciaDoc = "0 meses",
         claseContribuyente = "Otro",
         obligacionesPendientes = emptyList()
     )
-    MaterialTheme {
+    SRITheme(darkTheme = false) {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = { Text("Detalle Estado Tributario") },
+                    navigationIcon = {
+                        IconButton(onClick = {}) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                        }
+                    }
+                )
+            }
+        ) { padding ->
+            Box(Modifier.padding(padding)) {
+                EstadoTributarioDetalleContent(
+                    contribuyente = contribuyenteConObligaciones,
+                    onObligacionClick = {}
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, name = "Pantalla Detalle con Obligaciones", widthDp = 360)
+@Composable
+fun EstadoTributarioDetalleDarkScreenPreview_Iactivo() {
+    val contribuyenteConObligaciones = EstadoTributarioDomain(
+        ruc = "1314411206001",
+        razonSocial = "MOREIRA TORRES YESSICA ELIZABETH",
+        descripcion = "CONTRIBUYENTE NO ACTIVO",
+        plazoVigenciaDoc = "0 meses",
+        claseContribuyente = "Otro",
+        obligacionesPendientes = emptyList()
+    )
+    SRITheme(darkTheme = true) {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(

@@ -30,6 +30,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ec.gob.sri.movil.common.framework.ui.components.SriButton
 import ec.gob.sri.movil.common.framework.ui.components.SriTextField
+import ec.gob.sri.movil.common.framework.ui.theme.SRITheme
 import ec.gob.sri.movil.common.framework.ui.util.ObserveAsEvents
 
 @Composable
@@ -134,34 +135,37 @@ fun EstadoTributarioContent(
             Spacer(modifier = Modifier.padding(10.0.dp))
 
             SriButton(
-                text = if (state.isLoading) "Consultando..." else "Consultar",
-                enabled = state.isConsultarEnabled,
+                text = "Consultar",
+                enabled = state.isConsultarEnabled && !state.isLoading,
                 isLoading = state.isLoading,
                 onClick = {
                     onAction(EstadoTributarioAction.OnConsultarClick)
                 },
                 modifier = Modifier.fillMaxWidth()
             )
-
-            if (state.isLoading) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
         }
     }
 }
 
 @Preview(showBackground = true, widthDp = 360)
 @Composable
-private fun EstadoTributarioContentPreview() {
-    MaterialTheme(colorScheme = lightColorScheme()) {
+private fun EstadoTributarioLightContentPreview() {
+    SRITheme(darkTheme = false) {
+        val snackbarState = remember {
+            SnackbarHostState()
+        }
+        EstadoTributarioContent(
+            state = EstadoTributarioState(ruc = ""),
+            snackbarState = snackbarState,
+            onAction = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, widthDp = 360)
+@Composable
+private fun EstadoTributarioDarkContentPreview() {
+    SRITheme(darkTheme = true) {
         val snackbarState = remember {
             SnackbarHostState()
         }

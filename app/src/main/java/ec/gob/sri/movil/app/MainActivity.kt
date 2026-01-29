@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
 import ec.gob.sri.movil.app.navigation.AppNavigation
 import ec.gob.sri.movil.app.ui.theme.SRIMovilAndroidTheme
+import ec.gob.sri.movil.common.framework.ui.theme.SRITheme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -18,7 +19,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            SRIMovilAndroidTheme {
+            SRITheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
