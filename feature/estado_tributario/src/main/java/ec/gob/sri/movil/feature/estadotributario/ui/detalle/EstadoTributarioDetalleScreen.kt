@@ -68,6 +68,7 @@ import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDeta
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextOverflow
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -190,6 +191,7 @@ fun EstadoTributarioDetalleContent(
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface,
+                overflow = TextOverflow.Ellipsis,
                 maxLines = 2
             )
             Spacer(modifier = Modifier.height(4.dp))
