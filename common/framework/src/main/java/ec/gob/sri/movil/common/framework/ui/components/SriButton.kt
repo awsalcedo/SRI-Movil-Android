@@ -32,14 +32,15 @@ fun SriButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.45f),
-            contentColor = Color.White,
-            disabledContentColor = Color.White.copy(alpha = 0.85f)
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f)
         ),
         contentPadding = PaddingValues(12.dp)
     ) {
         if (isLoading) {
             CircularProgressIndicator(
                 strokeWidth = 2.dp,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
             )

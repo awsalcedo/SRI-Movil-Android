@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ec.gob.sri.movil.common.framework.ui.theme.SRITheme
+import ec.gob.sri.movil.common.framework.ui.theme.SriStatus
 import ec.gob.sri.movil.feature.estadotributario.domain.models.EstadoTributarioDomain
 import ec.gob.sri.movil.feature.estadotributario.domain.models.ObligacionesPendientesDomain
 import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDetalleAction
@@ -188,7 +189,6 @@ private fun EstadoTributarioFooterDisclaimer() {
         modifier = Modifier
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.navigationBars)
-            .padding(bottom = 4.dp)
     ) {
         Text(
             text = "El tiempo reflejado en el Plazo de Vigencia de los Documentos, " +
@@ -209,7 +209,7 @@ fun EstadoTributarioDetalleContent(
     onObligacionClick: (ObligacionesPendientesDomain) -> Unit
 ) {
     val isNoActivo = contribuyente.descripcion.contains("NO ACTIVO", ignoreCase = true)
-    val isAlDia = contribuyente.descripcion.contains("AL DÍA", ignoreCase = true)
+    val isAlDia = contribuyente.descripcion.contains("AL DIA", ignoreCase = true)
             || contribuyente.descripcion.contains("AL DÍA", ignoreCase = true)
 
 
@@ -273,11 +273,12 @@ fun EstadoTributarioDetalleContent(
 private fun EmptyObligationsCard(
     descripcion: String
 ) {
-    val isAlDia = descripcion.contains("AL DÍA", ignoreCase = true)
+    val isAlDia = descripcion.contains("AL DIA", ignoreCase = true) ||
+            descripcion.contains("AL DÍA", ignoreCase = true)
 
+    val status = if (isAlDia) SriStatus.ok() else SriStatus.warn()
     val icon = if (isAlDia) Icons.Default.CheckCircle else Icons.Default.Warning
-    val tonalColor =
-        if (isAlDia) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -290,13 +291,13 @@ private fun EmptyObligationsCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Surface(
-                color = tonalColor.copy(alpha = 0.12f),
+                color = status.container,
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = tonalColor,
+                    tint = status.icon,
                     modifier = Modifier
                         .padding(10.dp)
                         .size(18.dp)
@@ -324,17 +325,18 @@ private fun EmptyObligationsCard(
 
 @Composable
 fun GeneralInfoCard(info: EstadoTributarioDomain) {
-    val isAlDia = info.descripcion.contains("AL DÍA", ignoreCase = true)
+    val isAlDia = info.descripcion.contains("AL DIA", ignoreCase = true) ||
+            info.descripcion.contains("AL DÍA", ignoreCase = true)
 
+    val status = if (isAlDia) SriStatus.ok() else SriStatus.warn()
     val statusIcon = if (isAlDia) Icons.Default.CheckCircle else Icons.Default.Warning
-    val statusColor =
-        if (isAlDia) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
@@ -357,8 +359,8 @@ fun GeneralInfoCard(info: EstadoTributarioDomain) {
 
                 // Badge minimalista
                 Surface(
-                    color = statusColor.copy(alpha = 0.12f),
-                    contentColor = statusColor,
+                    color = status.container,
+                    contentColor = status.icon,
                     shape = RoundedCornerShape(999.dp)
                 ) {
                     Row(
@@ -368,14 +370,14 @@ fun GeneralInfoCard(info: EstadoTributarioDomain) {
                         Icon(
                             imageVector = statusIcon,
                             contentDescription = null,
-                            tint = statusColor
+                            tint = status.icon
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = if (isAlDia) "AL DÍA" else "REVISAR",
+                            text = if (isAlDia) "AL DIA" else "REVISAR",
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.SemiBold,
-                            color = statusColor
+                            color = status.text
                         )
                     }
                 }
@@ -386,7 +388,7 @@ fun GeneralInfoCard(info: EstadoTributarioDomain) {
                 text = info.descripcion,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold,
-                color = statusColor
+                color = status.text
             )
 
             // Detalles
@@ -425,15 +427,14 @@ private fun ObligationsCard(
     val totalPeriodos = obligaciones.sumOf { it.periodos.size }
 
     // AL DÍA (enabled=false): icono check + color primary + título "Obligaciones"
+    val status = if (enabled) SriStatus.warn() else SriStatus.ok()
     val headerIcon = if (enabled) Icons.Default.Warning else Icons.Default.CheckCircle
-    val headerColor =
-        if (enabled) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
     val headerTitle = if (enabled) "Obligaciones pendientes" else "Obligaciones"
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -444,13 +445,13 @@ private fun ObligationsCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Surface(
-                    color = headerColor.copy(alpha = 0.12f),
+                    color = status.container,
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Icon(
                         imageVector = headerIcon,
                         contentDescription = null,
-                        tint = headerColor.copy(alpha = 0.9f),
+                        tint = status.icon,
                         modifier = Modifier
                             .padding(8.dp)
                             .size(18.dp)
@@ -557,7 +558,7 @@ private fun ObligacionRow(
             )
         }
 
-        // ✅ Flecha solo si es interactivo
+        // Flecha solo si es interactivo
         if (enabled) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -758,11 +759,11 @@ fun EstadoTributarioDetalleLightScreenPreview_ActivoSinObligaciones() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, name = "Pantalla Detalle con Obligaciones", widthDp = 360)
+@Preview(showBackground = true, name = "Pantalla Detalle Activo sin Obligaciones", widthDp = 360)
 @Composable
 fun EstadoTributarioDetalleDarkScreenPreview_ActivoSinObligaciones() {
     val contribuyenteConObligaciones = EstadoTributarioDomain(
-        ruc = "1314411206001",
+        ruc = "1712245974001",
         razonSocial = "SALCEDO SILVA ALEX WLADIMIR",
         descripcion = "AL DIA EN SUS OBLIGACIONES",
         plazoVigenciaDoc = "0 meses",

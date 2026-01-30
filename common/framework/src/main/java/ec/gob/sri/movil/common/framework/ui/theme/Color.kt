@@ -1,62 +1,100 @@
 package ec.gob.sri.movil.common.framework.ui.theme
 
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
-// Marca (ajusta a tu guideline SRI)
-private val SriBlue = Color(0xFF0401A9)
-private val SriBlueDark = Color(0xFF7AA7FF)
+// ---------- LIGHT ----------
+val primaryLight = Color(0xFF000066)
+val onPrimaryLight = Color(0xFFFFFFFF)
+val primaryContainerLight = Color(0xFF0000A4)
+val onPrimaryContainerLight = Color(0xFF818AFF)
 
-// Neutrales pro (no muy contrastados)
-private val Neutral10 = Color(0xFF0F172A)
-private val Neutral20 = Color(0xFF1E293B)
-private val Neutral90 = Color(0xFFF8FAFC)
+val secondaryLight = Color(0xFF565A8F)
+val onSecondaryLight = Color(0xFFFFFFFF)
+val secondaryContainerLight = Color(0xFFBFC2FE)
+val onSecondaryContainerLight = Color(0xFF4A4E82)
 
-// Estados
-private val Error = Color(0xFFB3261E)
+val tertiaryLight = Color(0xFF30003F)
+val onTertiaryLight = Color(0xFFFFFFFF)
+val tertiaryContainerLight = Color(0xFF500068)
+val onTertiaryContainerLight = Color(0xFFC478D9)
 
-val SriLightColorScheme = lightColorScheme(
-    primary = SriBlue,
-    onPrimary = Color.White,
-    secondary = Color(0xFF44546F),
-    onSecondary = Color.White,
+val errorLight = Color(0xFFBA1A1A)
+val onErrorLight = Color(0xFFFFFFFF)
+val errorContainerLight = Color(0xFFFFDAD6)
+val onErrorContainerLight = Color(0xFF93000A)
 
-    background = Neutral90,
-    onBackground = Neutral10,
+val backgroundLight = Color(0xFFFBF8FF)
+val onBackgroundLight = Color(0xFF1B1B23)
 
-    surface = Color.White,
-    onSurface = Neutral10,
+val surfaceLight = Color(0xFFFBF8FF)
+val onSurfaceLight = Color(0xFF1B1B23)
 
-    surfaceVariant = Color(0xFFEFF3F9),
-    onSurfaceVariant = Color(0xFF334155),
+val surfaceVariantLight = Color(0xFFE2E1F3)
+val onSurfaceVariantLight = Color(0xFF454654)
 
-    outline = Color(0xFFCBD5E1),
-    outlineVariant = Color(0xFFE2E8F0),
+val outlineLight = Color(0xFF767686)
+val outlineVariantLight = Color(0xFFC6C5D7)
 
-    error = Error,
-    onError = Color.White
-)
+val scrimLight = Color(0xFF000000)
 
-val SriDarkColorScheme = darkColorScheme(
-    primary = SriBlueDark,
-    onPrimary = Color(0xFF0B1220),
+val inverseSurfaceLight = Color(0xFF303038)
+val inverseOnSurfaceLight = Color(0xFFF2EFFB)
+val inversePrimaryLight = Color(0xFFBFC2FF)
 
-    secondary = Color(0xFFB7C4D9),
-    onSecondary = Color(0xFF0B1220),
+// Surface containers (importantes en M3 para Cards/Sheets)
+val surfaceDimLight = Color(0xFFDBD8E4)
+val surfaceBrightLight = Color(0xFFFBF8FF)
+val surfaceContainerLowestLight = Color(0xFFFFFFFF)
+val surfaceContainerLowLight = Color(0xFFF5F2FE)
+val surfaceContainerLight = Color(0xFFEFECF8)
+val surfaceContainerHighLight = Color(0xFFE9E7F2)
+val surfaceContainerHighestLight = Color(0xFFE3E1EC)
 
-    background = Color(0xFF0B1220),
-    onBackground = Color(0xFFE6EDF8),
 
-    surface = Color(0xFF0F172A),
-    onSurface = Color(0xFFE6EDF8),
+// ---------- DARK ----------
+val primaryDark = Color(0xFFBFC2FF)
+val onPrimaryDark = Color(0xFF0609A6)
+val primaryContainerDark = Color(0xFF0000A4)
+val onPrimaryContainerDark = Color(0xFF818AFF)
 
-    surfaceVariant = Color(0xFF162033),
-    onSurfaceVariant = Color(0xFFB8C7E1),
+val secondaryDark = Color(0xFFBFC2FE)
+val onSecondaryDark = Color(0xFF282B5D)
+val secondaryContainerDark = Color(0xFF414478)
+val onSecondaryContainerDark = Color(0xFFB1B4EF)
 
-    outline = Color(0xFF3A4A66),
-    outlineVariant = Color(0xFF22304A),
+val tertiaryDark = Color(0xFFF0B0FF)
+val onTertiaryDark = Color(0xFF53046B)
+val tertiaryContainerDark = Color(0xFF500068)
+val onTertiaryContainerDark = Color(0xFFC478D9)
 
-    error = Color(0xFFF2B8B5),
-    onError = Color(0xFF601410)
-)
+val errorDark = Color(0xFFFFB4AB)
+val onErrorDark = Color(0xFF690005)
+val errorContainerDark = Color(0xFF93000A)
+val onErrorContainerDark = Color(0xFFFFDAD6)
+
+val backgroundDark = Color(0xFF12131A)
+val onBackgroundDark = Color(0xFFE3E1EC)
+
+val surfaceDark = Color(0xFF12131A)
+val onSurfaceDark = Color(0xFFE3E1EC)
+
+val surfaceVariantDark = Color(0xFF454654)
+val onSurfaceVariantDark = Color(0xFFC6C5D7)
+
+val outlineDark = Color(0xFF908FA0)
+val outlineVariantDark = Color(0xFF454654)
+
+val scrimDark = Color(0xFF000000)
+
+val inverseSurfaceDark = Color(0xFFE3E1EC)
+val inverseOnSurfaceDark = Color(0xFF303038)
+val inversePrimaryDark = Color(0xFF454DD2)
+
+// Surface containers (importantes en M3)
+val surfaceDimDark = Color(0xFF12131A)
+val surfaceBrightDark = Color(0xFF383841)
+val surfaceContainerLowestDark = Color(0xFF0D0E15)
+val surfaceContainerLowDark = Color(0xFF1B1B23)
+val surfaceContainerDark = Color(0xFF1F1F27)
+val surfaceContainerHighDark = Color(0xFF292932)
+val surfaceContainerHighestDark = Color(0xFF34343D)
