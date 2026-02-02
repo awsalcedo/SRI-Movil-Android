@@ -1,6 +1,8 @@
 package ec.gob.sri.movil.common.framework.ui.components
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -26,14 +28,14 @@ fun SriButton(
 
     Button(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.height(48.dp),
         enabled = finalEnabled,
         shape = RoundedCornerShape(10.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
-            disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.45f),
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
             contentColor = MaterialTheme.colorScheme.onPrimary,
-            disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f)
+            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
         ),
         contentPadding = PaddingValues(12.dp)
     ) {
@@ -41,7 +43,7 @@ fun SriButton(
             CircularProgressIndicator(
                 strokeWidth = 2.dp,
                 color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier
+                modifier = Modifier.size(18.dp)
                     .align(Alignment.CenterVertically)
             )
         } else {
