@@ -80,15 +80,13 @@ android {
 }
 
 dependencies {
-
-    implementation(project(":common:data"))
-    implementation(project(":common:domain"))
+    implementation(project(":common:domain"))//verificar en donde va lo de DefaultApiConfig que tiene la url base y contextoApi
+    implementation(project(":common:data")) // dejo este porque aún no se migra Login a una feature
     implementation(project(":common:framework"))
     implementation(project(":feature:estado_tributario"))
+    implementation(project(":feature:deudas"))
 
-
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
+    // Compose + Activity host
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
@@ -102,25 +100,20 @@ dependencies {
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.androidx.material3.adaptive.navigation3)
-    implementation(libs.kotlinx.serialization.core)
-    implementation(libs.androidx.compose.ui.text)
-    implementation(libs.androidx.hilt.navigation.compose)
-    ksp(libs.androidx.hilt.compiler)
+
+    // Lifecycle runtime
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+
+    //implementation(libs.kotlinx.serialization.core)
+    //implementation(libs.androidx.compose.ui.text)
+
 
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+    ksp(libs.androidx.hilt.compiler)
 
-    // Retrofit
-    implementation(libs.retrofit)
-    implementation(libs.converter.kotlinx.serialization)
-    implementation(libs.retrofit.converter)
-    implementation(libs.interceptor)
-
-    // Room
-    implementation(libs.androidx.room.ktx)
-    ksp(libs.room.compiler)
-    implementation(libs.androidx.room.runtime)
 
     // Timber
     implementation(libs.timber)

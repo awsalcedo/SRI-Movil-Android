@@ -46,6 +46,7 @@ dependencies {
     implementation(project(":common:data"))
     implementation(project(":common:domain"))
     implementation(project(":common:framework"))
+    implementation(project(":feature:deudas:domain"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -58,9 +59,7 @@ dependencies {
     implementation(libs.material3.adaptive)
     implementation(libs.androidx.compose.material.icons.extended)
 
-    //implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    //implementation(libs.material)
 
     // Retrofit
     implementation(libs.retrofit)

@@ -42,5 +42,4 @@ object EstadoTributarioModule {
     fun provideEstadoTributarioRepository(remoteDataSource: EstadoTributarioRemoteDataSource): EstadoTributarioRepository {
         return EstadoTributarioRepositoryImpl(remoteDataSource)
     }
-
 }

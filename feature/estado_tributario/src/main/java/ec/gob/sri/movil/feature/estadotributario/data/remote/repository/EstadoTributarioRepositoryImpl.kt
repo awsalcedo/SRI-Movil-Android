@@ -7,7 +7,6 @@ import ec.gob.sri.movil.feature.estadotributario.data.mapper.toDomain
 import ec.gob.sri.movil.feature.estadotributario.data.remote.datasource.EstadoTributarioRemoteDataSource
 import ec.gob.sri.movil.feature.estadotributario.domain.models.EstadoTributarioDomain
 import ec.gob.sri.movil.feature.estadotributario.domain.repository.EstadoTributarioRepository
-import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 class EstadoTributarioRepositoryImpl @Inject constructor(private val remoteDataSource: EstadoTributarioRemoteDataSource) :
@@ -26,6 +25,7 @@ class EstadoTributarioRepositoryImpl @Inject constructor(private val remoteDataS
 
     }
 
-    override fun getCachedEstadoTributario(ruc: String): EstadoTributarioDomain? = last?.takeIf { it.ruc == ruc }
+    override fun getCachedEstadoTributario(ruc: String): EstadoTributarioDomain? =
+        last?.takeIf { it.ruc == ruc }
 
 }

@@ -44,12 +44,10 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
 
     // Retrofit / OkHttp
-    implementation(libs.retrofit)
-    implementation(libs.converter.kotlinx.serialization)
-    implementation(libs.interceptor)
-
-    // Serialization
-    implementation(libs.kotlinx.serialization.json)
+    api(libs.retrofit)
+    api(libs.converter.kotlinx.serialization)
+    api(libs.interceptor)
+    api(libs.kotlinx.serialization.json)
 
     // Hilt
     implementation(libs.hilt.android)
