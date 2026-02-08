@@ -64,12 +64,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ec.gob.sri.movil.app.feature.deudas.domain.models.DeudasDomain
 import ec.gob.sri.movil.common.framework.ui.theme.SRITheme
 import ec.gob.sri.movil.common.framework.ui.theme.SriStatus
 import ec.gob.sri.movil.feature.estadotributario.domain.models.EstadoTributarioDomain
 import ec.gob.sri.movil.feature.estadotributario.domain.models.ObligacionesPendientesDomain
 import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDetalleAction
 import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDetalleEvent
+import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDetalleState
 import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDetalleViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -83,7 +85,8 @@ fun EstadoTributarioDetalleScreen(
     onBack: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val sheetState = rememberModalBottomSheetState()
+    val periodosSheetState = rememberModalBottomSheetState()
+    val deudasSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -96,8 +99,15 @@ fun EstadoTributarioDetalleScreen(
     // Para animar el BottomSheet
     LaunchedEffect(state.obligacionSeleccionada) {
         runCatching {
-            if (state.obligacionSeleccionada != null) sheetState.show()
-            else sheetState.hide()
+            if (state.obligacionSeleccionada != null) periodosSheetState.show()
+            else periodosSheetState.hide()
+        }
+    }
+
+    LaunchedEffect(state.isDeudasSheetOpen) {
+        runCatching {
+            if (state.isDeudasSheetOpen) deudasSheetState.show()
+            else deudasSheetState.hide()
         }
     }
 
@@ -123,16 +133,32 @@ fun EstadoTributarioDetalleScreen(
 
     state.obligacionSeleccionada?.let { obligacion ->
         ObligacionPeriodosSheet(
-            sheetState = sheetState,
+            sheetState = periodosSheetState,
             obligacion = obligacion,
             onDismiss = {
                 sheetScope.launch {
-                    sheetState.hide()
+                    periodosSheetState.hide()
                     viewModel.onDismissObligacion()
                 }
             }
         )
+    }
 
+    // Sheet de deudas firmes
+    if (state.isDeudasSheetOpen) {
+        DeudasFirmesSheet(
+            sheetState = deudasSheetState,
+            state = state,
+            onDismiss = {
+                sheetScope.launch {
+                    deudasSheetState.hide()
+                    viewModel.onAction(EstadoTributarioDetalleAction.OnDismissDeudasFirmes)
+                }
+            },
+            onRetry = {
+                viewModel.onAction(EstadoTributarioDetalleAction.OnRetryDeudasFirmes)
+            }
+        )
     }
 
     Scaffold(
@@ -179,6 +205,333 @@ fun EstadoTributarioDetalleScreen(
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DeudasFirmesSheet(
+    sheetState: SheetState,
+    state: EstadoTributarioDetalleState,
+    onDismiss: () -> Unit,
+    onRetry: () -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState
+    ) {
+        Column(
+            modifier = Modifier
+                .navigationBarsPadding()
+                .animateContentSize(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                )
+                .padding(bottom = 8.dp)
+        ) {
+            // Header
+            Text(
+                text = "Deudas firmes",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+            )
+
+            val deudas = state.deudasData
+            val contribuyente = deudas?.contribuyente
+
+            if (contribuyente != null) {
+                Text(
+                    text = contribuyente.denominacion ?: "Contribuyente",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+                Text(
+                    text = contribuyente.identificacion,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp)
+                )
+            }
+
+            Spacer(Modifier.height(8.dp))
+            HorizontalDivider()
+
+            when {
+                state.deudasLoading -> {
+                    SheetLoading()
+                }
+
+                state.deudasError != null -> {
+                    SheetError(
+                        message = state.deudasError!!.asString(LocalContext.current),
+                        onRetry = onRetry
+                    )
+                }
+
+                deudas != null -> {
+                    DeudasContent(deudas = deudas)
+                }
+
+                else -> {
+                    // caso raro: sheet abierto pero sin data/ni error
+                    SheetLoading()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SheetLoading() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator(modifier = Modifier.size(28.dp))
+        Spacer(Modifier.height(12.dp))
+        Text(
+            text = "Consultando información…",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun SheetError(
+    message: String,
+    onRetry: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.padding(14.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Warning,
+                    contentDescription = null
+                )
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        text = "No se pudo consultar",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        // Reintentar (simple, sin agregar Button si no lo tienes importado)
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(14.dp))
+                .clickable(role = Role.Button, onClick = onRetry),
+            color = MaterialTheme.colorScheme.primaryContainer
+        ) {
+            Text(
+                text = "Reintentar",
+                modifier = Modifier.padding(vertical = 12.dp),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+    }
+}
+
+@Composable
+private fun DeudasContent(
+    deudas: DeudasDomain
+) {
+    val deuda = deudas.deuda
+    val contrib = deudas.contribuyente
+
+    val impugnacion = deudas.impugnacion ?: "No registra"
+    val remision = deudas.remision ?: "No registra"
+
+    LazyColumn(
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        item {
+            SummaryCard(
+                fechaCorteMillis = contrib.fechaInformacion,
+                valor = deuda.valor,
+                descripcion = deuda.descripcion
+            )
+        }
+
+        item {
+            InfoBlockCard(
+                title = "Impugnaciones",
+                value = impugnacion
+            )
+        }
+
+        item {
+            InfoBlockCard(
+                title = "Remisión",
+                value = remision
+            )
+        }
+
+        val detalles = deuda.detallesRubro.orEmpty()
+        if (detalles.isNotEmpty()) {
+            item {
+                Text(
+                    text = "Detalle por rubro",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
+            itemsIndexed(detalles) { index, item ->
+                RubroRow(
+                    descripcion = item.descripcion,
+                    anio = item.anio,
+                    valor = item.valor
+                )
+
+                if (index < detalles.lastIndex) {
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SummaryCard(
+    fechaCorteMillis: Long,
+    valor: Double,
+    descripcion: String
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text(
+                text = "Resumen",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            InfoRow(label = "Fecha corte", value = fechaCorteMillis.toFechaCorte())
+            InfoRow(label = "Deudas firmes", value = valor.toUsdEc())
+            InfoRow(label = "Concepto", value = descripcion)
+        }
+    }
+}
+
+@Composable
+private fun InfoBlockCard(
+    title: String,
+    value: String
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun RubroRow(
+    descripcion: String,
+    anio: Int,
+    valor: Double
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(
+                text = descripcion,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = "Año: $anio",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        Text(
+            text = valor.toUsdEc(),
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
+}
+
+// ---- helpers de formato (sin dependencias extra) ----
+
+private fun Double.toUsdEc(): String {
+    // 60,00 USD (como tu captura legacy)
+    val v = String.format(java.util.Locale("es", "EC"), "%,.2f", this)
+    return "$v USD"
+}
+
+private fun Long.toFechaCorte(): String {
+    // si viene en millis
+    return runCatching {
+        val sdf = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale("es", "EC"))
+        sdf.format(java.util.Date(this))
+    }.getOrDefault("-")
+}
+
 
 @Composable
 private fun EstadoTributarioFooterDisclaimer() {
@@ -257,9 +610,7 @@ fun EstadoTributarioDetalleContent(
                             obligaciones = obligaciones,
                             enabled = enabled,
                             onObligacionClick = { obligacion ->
-                                if (enabled && obligacion.periodos.isNotEmpty()) {
-                                    onObligacionClick(obligacion)
-                                }
+                                if (enabled) onObligacionClick(obligacion)
                             }
                         )
                     }
@@ -479,7 +830,7 @@ private fun ObligationsCard(
             obligaciones.forEachIndexed { index, obligacion ->
                 ObligacionRow(
                     obligacion = obligacion,
-                    enabled = enabled && obligacion.periodos.isNotEmpty(),
+                    enabled = enabled && (obligacion.periodos.isNotEmpty() || obligacion.isDeudasFirmesUi()),
                     onClick = { onObligacionClick(obligacion) }
                 )
 
@@ -493,6 +844,11 @@ private fun ObligationsCard(
             }
         }
     }
+}
+
+private fun ObligacionesPendientesDomain.isDeudasFirmesUi(): Boolean {
+    val d = descripcion.uppercase()
+    return d.contains("DEUDAS") && d.contains("FIRMES")
 }
 
 @Composable
@@ -545,10 +901,10 @@ private fun ObligacionRow(
             )
 
             // Si está deshabilitado, mejor no insinuar “pendientes”
-            val supporting = if (enabled) {
-                "${obligacion.periodos.size} periodos pendientes"
-            } else {
-                "Sin periodos pendientes"
+            val supporting = when {
+                obligacion.isDeudasFirmesUi() -> "Ver detalle"
+                enabled -> "${obligacion.periodos.size} periodos pendientes"
+                else -> "Sin periodos pendientes"
             }
 
             Text(

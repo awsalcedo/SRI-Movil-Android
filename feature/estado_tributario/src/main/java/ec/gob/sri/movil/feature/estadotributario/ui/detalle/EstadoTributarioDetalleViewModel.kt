@@ -3,6 +3,7 @@ package ec.gob.sri.movil.feature.estadotributario.ui.detalle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ec.gob.sri.movil.app.feature.deudas.domain.usecase.ConsultarDeudasUseCase
 import ec.gob.sri.movil.common.domain.error.DataResult
 import ec.gob.sri.movil.common.framework.ui.error.toUiText
 import ec.gob.sri.movil.feature.estadotributario.domain.models.ObligacionesPendientesDomain
@@ -19,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class EstadoTributarioDetalleViewModel @Inject constructor(
     private val getCachedEstadoTributarioUseCase: GetCachedEstadoTributarioUseCase,
-    private val obtenerEstadoTributarioUseCase: ObtenerEstadoTributarioUseCase
+    private val obtenerEstadoTributarioUseCase: ObtenerEstadoTributarioUseCase,
+    private val consultarDeudasUseCase: ConsultarDeudasUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(EstadoTributarioDetalleState())
     val state = _state.asStateFlow()
@@ -32,6 +34,8 @@ class EstadoTributarioDetalleViewModel @Inject constructor(
     fun onAction(action: EstadoTributarioDetalleAction) {
         when (action) {
             is EstadoTributarioDetalleAction.OnLoad -> load(action.ruc)
+            is EstadoTributarioDetalleAction.OnDismissDeudasFirmes -> dismissDeudasSheet()
+            is EstadoTributarioDetalleAction.OnRetryDeudasFirmes -> retryDeudas()
         }
     }
 
@@ -75,6 +79,14 @@ class EstadoTributarioDetalleViewModel @Inject constructor(
      * Actualiza el estado para mostrar el BottomSheet.
      */
     fun onObligacionClick(obligacion: ObligacionesPendientesDomain) {
+        if (obligacion.isDeudasFirmes()) {
+            val ruc = _state.value.estadoTributario?.ruc ?: return
+            openDeudasSheetAndFetch(ruc)
+            return
+        }
+
+        // Solo abrir si hay periodos
+        if (obligacion.periodos.isEmpty()) return
         _state.update { it.copy(obligacionSeleccionada = obligacion) }
     }
 
@@ -84,5 +96,67 @@ class EstadoTributarioDetalleViewModel @Inject constructor(
      */
     fun onDismissObligacion() {
         _state.update { it.copy(obligacionSeleccionada = null) }
+    }
+
+    fun dismissDeudasSheet() {
+        _state.update {
+            it.copy(
+                isDeudasSheetOpen = false,
+                deudasLoading = false,
+                deudasData = null,
+                deudasError = null
+            )
+        }
+    }
+
+    private fun openDeudasSheetAndFetch(ruc: String) {
+        // Si ya está cargado y el sheet está abierto, no vuelvas a pegarle al backend.
+        val alreadyLoadedForThisRuc =
+            (_state.value.deudasData?.contribuyente?.identificacion == ruc)
+        if (_state.value.isDeudasSheetOpen && alreadyLoadedForThisRuc) return
+        if (_state.value.deudasLoading) return
+
+        _state.update {
+            it.copy(
+                isDeudasSheetOpen = true,
+                deudasLoading = true,
+                deudasError = null,
+                deudasData = null
+            )
+        }
+
+        viewModelScope.launch {
+            when (val result = consultarDeudasUseCase(ruc)) {
+                is DataResult.Success -> {
+                    _state.update {
+                        it.copy(
+                            deudasLoading = false,
+                            deudasData = result.data,
+                            deudasError = null
+                        )
+                    }
+                }
+
+                is DataResult.Error -> {
+                    _state.update {
+                        it.copy(
+                            deudasLoading = false,
+                            deudasError = result.error.toUiText()
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+
+    private fun retryDeudas() {
+        val ruc = _state.value.estadoTributario?.ruc ?: return
+        openDeudasSheetAndFetch(ruc)
+    }
+
+    private fun ObligacionesPendientesDomain.isDeudasFirmes(): Boolean {
+        val d = descripcion.uppercase()
+        return d.contains("DEUDAS") && d.contains("FIRMES")
     }
 }

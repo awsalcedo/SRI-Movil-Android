@@ -8,6 +8,7 @@ import ec.gob.sri.movil.app.feature.deudas.data.remote.datasource.DeudasRemoteDa
 import ec.gob.sri.movil.app.feature.deudas.data.remote.datasource.DeudasRemoteDataSourceImpl
 import ec.gob.sri.movil.app.feature.deudas.data.remote.service.DeudasService
 import ec.gob.sri.movil.common.domain.error.HttpErrorMapper
+import retrofit2.Retrofit
 import javax.inject.Singleton
 
 @Module
@@ -22,4 +23,9 @@ object DeudasModule {
     ): DeudasRemoteDataSource {
         return DeudasRemoteDataSourceImpl(service = service, httpErrorMapper = httpErrorMapper)
     }
+
+    @Provides
+    @Singleton
+    fun provideDeudasService(retrofit: Retrofit): DeudasService =
+        retrofit.create(DeudasService::class.java)
 }

@@ -85,6 +85,7 @@ dependencies {
     implementation(project(":common:framework"))
     implementation(project(":feature:estado_tributario"))
     implementation(project(":feature:deudas"))
+    implementation(project(":feature:deudas:di"))
 
     // Compose + Activity host
     implementation(libs.androidx.activity.compose)

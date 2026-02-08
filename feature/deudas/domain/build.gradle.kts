@@ -42,5 +42,8 @@ dependencies {
 
     implementation(project(":common:domain"))
 
+    // Para @Inject (JSR-330)
+    implementation(libs.javax.inject)
+
     testImplementation(libs.junit)
 }

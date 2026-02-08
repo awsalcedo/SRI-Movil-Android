@@ -1,4 +1,3 @@
-package ec.gob.sri.movil.app.feature.deudas.data.remote.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -10,9 +9,9 @@ data class DeudasDto(
     @SerialName("deuda")
     val deuda: DeudaDto,
     @SerialName("impugnacion")
-    val impugnacion: String,
+    val impugnacion: String?,
     @SerialName("remision")
-    val remision: String
+    val remision: String?
 )
 
 
@@ -35,9 +34,9 @@ data class ContribuyenteDto(
     @SerialName("fechaInformacion")
     val fechaInformacion: Long,
     @SerialName("mensaje")
-    val mensaje: String,
+    val mensaje: String?,
     @SerialName("estado")
-    val estado: String
+    val estado: String?
 )
 
 @Serializable
@@ -49,7 +48,7 @@ data class DeudaDto(
     @SerialName("periodoFiscal")
     val periodoFiscal: String?,
     @SerialName("beneficiario")
-    val beneficiario: String,
+    val beneficiario: String?,
     @SerialName("detallesRubro")
     val detallesRubro: List<DetalleRubroDto>?
 )
