@@ -1,3 +1,4 @@
+package ec.gob.sri.movil.app.feature.deudas.data.remote.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

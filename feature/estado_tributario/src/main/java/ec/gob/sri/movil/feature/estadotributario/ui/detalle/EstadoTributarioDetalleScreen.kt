@@ -1,4 +1,4 @@
-package ec.gob.sri.movil.app.estadotributario.ui.detalle
+package ec.gob.sri.movil.feature.estadotributario.ui.detalle
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
@@ -10,16 +10,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,6 +54,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -67,14 +65,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ec.gob.sri.movil.app.feature.deudas.domain.models.DeudasDomain
 import ec.gob.sri.movil.common.framework.ui.theme.SRITheme
 import ec.gob.sri.movil.common.framework.ui.theme.SriStatus
+import ec.gob.sri.movil.feature.estadotributario.R
 import ec.gob.sri.movil.feature.estadotributario.domain.models.EstadoTributarioDomain
 import ec.gob.sri.movil.feature.estadotributario.domain.models.ObligacionesPendientesDomain
-import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDetalleAction
-import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDetalleEvent
-import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDetalleState
-import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDetalleViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -166,7 +165,7 @@ fun EstadoTributarioDetalleScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        "Detalle Estado Tributario",
+                        stringResource(R.string.detalle_estado_tributario),
                         style = MaterialTheme.typography.titleLarge,
                         maxLines = 1
                     )
@@ -265,13 +264,32 @@ private fun DeudasFirmesSheet(
 
                 state.deudasError != null -> {
                     SheetError(
-                        message = state.deudasError!!.asString(LocalContext.current),
+                        message = state.deudasError.asString(LocalContext.current),
                         onRetry = onRetry
                     )
                 }
 
                 deudas != null -> {
-                    DeudasContent(deudas = deudas)
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = PaddingValues(bottom = 16.dp)
+                    ) {
+                        item {
+                            DeudasContent(deudas = deudas)
+                        }
+
+                        item {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            HorizontalDivider(
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                color = MaterialTheme.colorScheme.outlineVariant
+                            )
+                            DeudasFirmesDisclaimer()
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
+
+
                 }
 
                 else -> {
@@ -361,58 +379,42 @@ private fun SheetError(
 }
 
 @Composable
-private fun DeudasContent(
-    deudas: DeudasDomain
-) {
+private fun DeudasContent(deudas: DeudasDomain) {
     val deuda = deudas.deuda
     val contrib = deudas.contribuyente
 
     val impugnacion = deudas.impugnacion ?: "No registra"
     val remision = deudas.remision ?: "No registra"
 
-    LazyColumn(
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        item {
-            SummaryCard(
-                fechaCorteMillis = contrib.fechaInformacion,
-                valor = deuda.valor,
-                descripcion = deuda.descripcion
-            )
-        }
+        SummaryCard(
+            fechaCorteMillis = contrib.fechaInformacion,
+            valor = deuda.valor,
+            descripcion = deuda.descripcion
+        )
 
-        item {
-            InfoBlockCard(
-                title = "Impugnaciones",
-                value = impugnacion
-            )
-        }
-
-        item {
-            InfoBlockCard(
-                title = "Remisión",
-                value = remision
-            )
-        }
+        InfoBlockCard(title = "Impugnaciones", value = impugnacion)
+        InfoBlockCard(title = "Remisión", value = remision)
 
         val detalles = deuda.detallesRubro.orEmpty()
         if (detalles.isNotEmpty()) {
-            item {
-                Text(
-                    text = "Detalle por rubro",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
+            Text(
+                text = "Detalle por rubro",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
 
-            itemsIndexed(detalles) { index, item ->
+            detalles.forEachIndexed { index, item ->
                 RubroRow(
                     descripcion = item.descripcion,
                     anio = item.anio,
                     valor = item.valor
                 )
-
                 if (index < detalles.lastIndex) {
                     HorizontalDivider(
                         color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
@@ -422,6 +424,7 @@ private fun DeudasContent(
         }
     }
 }
+
 
 @Composable
 private fun SummaryCard(
@@ -517,44 +520,25 @@ private fun RubroRow(
 }
 
 // ---- helpers de formato (sin dependencias extra) ----
+private val ECUADOR_LOCALE: Locale = Locale.forLanguageTag("es-EC")
 
 private fun Double.toUsdEc(): String {
-    // 60,00 USD (como tu captura legacy)
-    val v = String.format(java.util.Locale("es", "EC"), "%,.2f", this)
-    return "$v USD"
+    // 60,00 USD
+    val value = String.format(ECUADOR_LOCALE, "%,.2f", this)
+    return "$value USD"
 }
 
 private fun Long.toFechaCorte(): String {
-    // si viene en millis
     return runCatching {
-        val sdf = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale("es", "EC"))
-        sdf.format(java.util.Date(this))
+        Instant.ofEpochMilli(this)
+            .atZone(ZoneId.of("America/Guayaquil"))
+            .toLocalDate()
+            .format(
+                DateTimeFormatter
+                    .ofPattern("dd/MM/yyyy", ECUADOR_LOCALE)
+            )
     }.getOrDefault("-")
 }
-
-
-@Composable
-private fun EstadoTributarioFooterDisclaimer() {
-    Surface(
-        tonalElevation = 0.dp,
-        shadowElevation = 0.dp,
-        color = MaterialTheme.colorScheme.surface,
-        modifier = Modifier
-            .fillMaxWidth()
-            .windowInsetsPadding(WindowInsets.navigationBars)
-    ) {
-        Text(
-            text = "El tiempo reflejado en el Plazo de Vigencia de los Documentos, " +
-                    "corresponde al tiempo que tendrá vigencia los documentos impresos el día de hoy.",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
-}
-
 
 @Composable
 fun EstadoTributarioDetalleContent(
@@ -562,8 +546,12 @@ fun EstadoTributarioDetalleContent(
     onObligacionClick: (ObligacionesPendientesDomain) -> Unit
 ) {
     val isNoActivo = contribuyente.descripcion.contains("NO ACTIVO", ignoreCase = true)
-    val isAlDia = contribuyente.descripcion.contains("AL DIA", ignoreCase = true)
-            || contribuyente.descripcion.contains("AL DÍA", ignoreCase = true)
+    val isAlDia =
+        contribuyente.descripcion.contains(stringResource(R.string.al_dia), ignoreCase = true)
+                || contribuyente.descripcion.contains(
+            stringResource(R.string.al_dia_tilde),
+            ignoreCase = true
+        )
 
 
     LazyColumn(
@@ -624,8 +612,8 @@ fun EstadoTributarioDetalleContent(
 private fun EmptyObligationsCard(
     descripcion: String
 ) {
-    val isAlDia = descripcion.contains("AL DIA", ignoreCase = true) ||
-            descripcion.contains("AL DÍA", ignoreCase = true)
+    val isAlDia = descripcion.contains(stringResource(R.string.al_dia), ignoreCase = true) ||
+            descripcion.contains(stringResource(R.string.al_dia_tilde), ignoreCase = true)
 
     val status = if (isAlDia) SriStatus.ok() else SriStatus.warn()
     val icon = if (isAlDia) Icons.Default.CheckCircle else Icons.Default.Warning
@@ -900,7 +888,6 @@ private fun ObligacionRow(
                 maxLines = 2
             )
 
-            // Si está deshabilitado, mejor no insinuar “pendientes”
             val supporting = when {
                 obligacion.isDeudasFirmesUi() -> "Ver detalle"
                 enabled -> "${obligacion.periodos.size} periodos pendientes"
@@ -1013,7 +1000,7 @@ fun EstadoTributarioDetalleLightScreenPreview_ActivoConObligaciones() {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = { Text("Detalle Estado Tributario") },
+                    title = { Text(stringResource(R.string.detalle_estado_tributario)) },
                     navigationIcon = {
                         IconButton(onClick = {}) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
@@ -1054,7 +1041,7 @@ fun EstadoTributarioDetalleDarkScreenPreview_ActivoConObligaciones() {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = { Text("Detalle Estado Tributario") },
+                    title = { Text(stringResource(R.string.detalle_estado_tributario)) },
                     navigationIcon = {
                         IconButton(onClick = {}) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
@@ -1081,21 +1068,24 @@ fun EstadoTributarioDetalleLightScreenPreview_ActivoSinObligaciones() {
         ruc = "1314411206001",
         razonSocial = "SALCEDO SILVA ALEX WLADIMIR",
         descripcion = "AL DIA EN SUS OBLIGACIONES",
-        plazoVigenciaDoc = "0 meses",
+        plazoVigenciaDoc = stringResource(R.string.cero_meses),
         claseContribuyente = "Otro",
         obligacionesPendientes = listOf(
             ObligacionesPendientesDomain(
                 "SIN OBLIGACIONES TRIBUTARIAS",
                 emptyList()
             ),
-            ObligacionesPendientesDomain("CONTRIBUYENTE NO ACTIVO", emptyList())
+            ObligacionesPendientesDomain(
+                stringResource(R.string.contrinuyente_no_activo),
+                emptyList()
+            )
         )
     )
     SRITheme(darkTheme = false) {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = { Text("Detalle Estado Tributario") },
+                    title = { Text(stringResource(R.string.detalle_estado_tributario)) },
                     navigationIcon = {
                         IconButton(onClick = {}) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
@@ -1122,21 +1112,24 @@ fun EstadoTributarioDetalleDarkScreenPreview_ActivoSinObligaciones() {
         ruc = "1712245974001",
         razonSocial = "SALCEDO SILVA ALEX WLADIMIR",
         descripcion = "AL DIA EN SUS OBLIGACIONES",
-        plazoVigenciaDoc = "0 meses",
+        plazoVigenciaDoc = stringResource(R.string.cero_meses),
         claseContribuyente = "Otro",
         obligacionesPendientes = listOf(
             ObligacionesPendientesDomain(
                 "SIN OBLIGACIONES TRIBUTARIAS",
                 emptyList()
             ),
-            ObligacionesPendientesDomain("CONTRIBUYENTE NO ACTIVO", emptyList())
+            ObligacionesPendientesDomain(
+                stringResource(R.string.contrinuyente_no_activo),
+                emptyList()
+            )
         )
     )
     SRITheme(darkTheme = true) {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = { Text("Detalle Estado Tributario") },
+                    title = { Text(stringResource(R.string.detalle_estado_tributario)) },
                     navigationIcon = {
                         IconButton(onClick = {}) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
@@ -1158,12 +1151,12 @@ fun EstadoTributarioDetalleDarkScreenPreview_ActivoSinObligaciones() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, name = "Pantalla Detalle con Obligaciones", widthDp = 360)
 @Composable
-fun EstadoTributarioDetalleLigthScreenPreview_Iactivo() {
+fun EstadoTributarioDetalleLigthScreenPreview_Inactivo() {
     val contribuyenteConObligaciones = EstadoTributarioDomain(
         ruc = "1314411206001",
         razonSocial = "MOREIRA TORRES YESSICA ELIZABETH",
         descripcion = "CONTRIBUYENTE NO ACTIVO",
-        plazoVigenciaDoc = "0 meses",
+        plazoVigenciaDoc = stringResource(R.string.cero_meses),
         claseContribuyente = "Otro",
         obligacionesPendientes = emptyList()
     )
@@ -1171,7 +1164,7 @@ fun EstadoTributarioDetalleLigthScreenPreview_Iactivo() {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = { Text("Detalle Estado Tributario") },
+                    title = { Text(stringResource(R.string.detalle_estado_tributario)) },
                     navigationIcon = {
                         IconButton(onClick = {}) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
@@ -1193,12 +1186,12 @@ fun EstadoTributarioDetalleLigthScreenPreview_Iactivo() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, name = "Pantalla Detalle con Obligaciones", widthDp = 360)
 @Composable
-fun EstadoTributarioDetalleDarkScreenPreview_Iactivo() {
+fun EstadoTributarioDetalleDarkScreenPreview_Inactivo() {
     val contribuyenteConObligaciones = EstadoTributarioDomain(
         ruc = "1314411206001",
         razonSocial = "MOREIRA TORRES YESSICA ELIZABETH",
         descripcion = "CONTRIBUYENTE NO ACTIVO",
-        plazoVigenciaDoc = "0 meses",
+        plazoVigenciaDoc = stringResource(R.string.cero_meses),
         claseContribuyente = "Otro",
         obligacionesPendientes = emptyList()
     )
@@ -1206,7 +1199,7 @@ fun EstadoTributarioDetalleDarkScreenPreview_Iactivo() {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = { Text("Detalle Estado Tributario") },
+                    title = { Text(stringResource(R.string.detalle_estado_tributario)) },
                     navigationIcon = {
                         IconButton(onClick = {}) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, null)

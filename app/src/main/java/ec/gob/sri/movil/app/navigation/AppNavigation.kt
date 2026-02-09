@@ -10,7 +10,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import ec.gob.sri.movil.app.estadotributario.ui.detalle.EstadoTributarioDetalleScreen
+import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDetalleScreen
 import ec.gob.sri.movil.feature.estadotributario.ui.consulta.EstadoTributarioScreen
 
 @Composable
