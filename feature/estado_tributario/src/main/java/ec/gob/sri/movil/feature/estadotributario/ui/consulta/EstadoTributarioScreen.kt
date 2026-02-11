@@ -1,25 +1,25 @@
 package ec.gob.sri.movil.feature.estadotributario.ui.consulta
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -37,7 +37,8 @@ import ec.gob.sri.movil.common.framework.ui.util.ObserveAsEvents
 fun EstadoTributarioScreen(
     viewModel: EstadoTributarioViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
-    onNavigateToDetail: (String) -> Unit
+    onNavigateToDetail: (String) -> Unit,
+    onBack: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -61,7 +62,8 @@ fun EstadoTributarioScreen(
     EstadoTributarioContent(
         state = state,
         snackbarState = snackbarState,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        onBack = onBack
     )
 }
 
@@ -70,7 +72,8 @@ fun EstadoTributarioScreen(
 fun EstadoTributarioContent(
     state: EstadoTributarioState,
     snackbarState: SnackbarHostState,
-    onAction: (EstadoTributarioAction) -> Unit
+    onAction: (EstadoTributarioAction) -> Unit,
+    onBack: () -> Unit
 ) {
 
     val focusManager = LocalFocusManager.current
@@ -85,6 +88,14 @@ fun EstadoTributarioContent(
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
                     )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver"
+                        )
+                    }
                 }
             )
         },
@@ -157,7 +168,8 @@ private fun EstadoTributarioLightContentPreview() {
         EstadoTributarioContent(
             state = EstadoTributarioState(ruc = ""),
             snackbarState = snackbarState,
-            onAction = {}
+            onAction = {},
+            onBack = {}
         )
     }
 }
@@ -172,7 +184,8 @@ private fun EstadoTributarioDarkContentPreview() {
         EstadoTributarioContent(
             state = EstadoTributarioState(ruc = ""),
             snackbarState = snackbarState,
-            onAction = {}
+            onAction = {},
+            onBack = {}
         )
     }
 }

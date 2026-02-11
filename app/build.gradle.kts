@@ -83,6 +83,8 @@ dependencies {
     implementation(project(":common:domain"))//verificar en donde va lo de DefaultApiConfig que tiene la url base y contextoApi
     implementation(project(":common:data")) // dejo este porque aún no se migra Login a una feature
     implementation(project(":common:framework"))
+    implementation(project(":common:navigation"))
+    implementation(project(":feature:home"))
     implementation(project(":feature:estado_tributario"))
     implementation(project(":feature:deudas"))
     implementation(project(":feature:deudas:di"))

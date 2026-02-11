@@ -1,4 +1,4 @@
-package ec.gob.sri.movil.app.navigation
+package ec.gob.sri.movil.app.common.navigation
 
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
@@ -9,7 +9,7 @@ sealed class NavigationRoute : NavKey {
     data object LoginScreen : NavigationRoute()
 
     @Serializable
-    data object ConsultasScreen : NavigationRoute()
+    data object HomeScreen : NavigationRoute()
 
     @Serializable
     data object EstadoTributarioScreen : NavigationRoute()

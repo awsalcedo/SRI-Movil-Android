@@ -1,26 +1,34 @@
 package ec.gob.sri.movil.app.navigation
 
+import android.content.Intent
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDetalleScreen
+import ec.gob.sri.movil.app.common.navigation.NavigationRoute
+import ec.gob.sri.movil.app.common.navigation.back
+import ec.gob.sri.movil.app.common.navigation.navigateTo
+import ec.gob.sri.movil.app.feature.home.ui.HomeScreen
 import ec.gob.sri.movil.feature.estadotributario.ui.consulta.EstadoTributarioScreen
+import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDetalleScreen
 
 @Composable
 fun AppNavigation() {
-    val backStack = rememberNavBackStack(NavigationRoute.EstadoTributarioScreen)
+    val backStack = rememberNavBackStack(NavigationRoute.HomeScreen)
 
     NavDisplay(
         backStack = backStack,
         onBack = { backStack.back() },
         entryProvider = entryProvider {
+            routeHomeEntry(backStack)
             routeEstadoTributarioEntry(backStack)
             routeEstadoTributarioDetalleEntry(backStack)
         },
@@ -46,6 +54,19 @@ fun AppNavigation() {
 }
 
 @Composable
+private fun EntryProviderScope<NavKey>.routeHomeEntry(backStack: NavBackStack<NavKey>) {
+    val context = LocalContext.current
+    entry<NavigationRoute.HomeScreen> {
+        HomeScreen(
+            onNavigate = { route -> backStack.navigateTo(route) },
+            openUrl = { url ->
+                context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+            }
+        )
+    }
+}
+
+@Composable
 private fun EntryProviderScope<NavKey>.routeEstadoTributarioEntry(backStack: NavBackStack<NavKey>) {
     entry<NavigationRoute.EstadoTributarioScreen> {
         EstadoTributarioScreen(
@@ -54,6 +75,11 @@ private fun EntryProviderScope<NavKey>.routeEstadoTributarioEntry(backStack: Nav
                     NavigationRoute.EstadoTributarioDetalleScreen(
                         it
                     )
+                )
+            },
+            onBack = {
+                backStack.navigateTo(
+                    NavigationRoute.HomeScreen
                 )
             }
         )

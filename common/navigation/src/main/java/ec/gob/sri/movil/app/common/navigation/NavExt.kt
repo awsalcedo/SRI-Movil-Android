@@ -1,4 +1,4 @@
-package ec.gob.sri.movil.app.navigation
+package ec.gob.sri.movil.app.common.navigation
 
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey

@@ -10,7 +10,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
 import ec.gob.sri.movil.app.navigation.AppNavigation
-import ec.gob.sri.movil.app.ui.theme.SRIMovilAndroidTheme
 import ec.gob.sri.movil.common.framework.ui.theme.SRITheme
 
 @AndroidEntryPoint
