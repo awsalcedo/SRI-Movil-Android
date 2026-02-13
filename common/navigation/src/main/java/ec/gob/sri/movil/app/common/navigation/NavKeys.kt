@@ -18,5 +18,8 @@ sealed class NavigationRoute : NavKey {
     data class EstadoTributarioDetalleScreen(val ruc: String) : NavigationRoute()
 
     @Serializable
+    data object DeudasScreen : NavigationRoute()
+
+    @Serializable
     data object MatriculacionVehicularScreen : NavigationRoute()
 }

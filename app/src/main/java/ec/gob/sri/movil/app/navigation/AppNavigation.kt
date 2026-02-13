@@ -16,6 +16,8 @@ import androidx.navigation3.ui.NavDisplay
 import ec.gob.sri.movil.app.common.navigation.NavigationRoute
 import ec.gob.sri.movil.app.common.navigation.back
 import ec.gob.sri.movil.app.common.navigation.navigateTo
+import ec.gob.sri.movil.app.feature.deudas.ui.consulta.DeudasConsultaEvent
+import ec.gob.sri.movil.app.feature.deudas.ui.consulta.DeudasConsultaScreen
 import ec.gob.sri.movil.app.feature.home.ui.HomeScreen
 import ec.gob.sri.movil.feature.estadotributario.ui.consulta.EstadoTributarioScreen
 import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDetalleScreen
@@ -31,6 +33,7 @@ fun AppNavigation() {
             routeHomeEntry(backStack)
             routeEstadoTributarioEntry(backStack)
             routeEstadoTributarioDetalleEntry(backStack)
+            routeDeudasEntry(backStack)
         },
         transitionSpec = {
             slideInHorizontally(
@@ -61,6 +64,22 @@ private fun EntryProviderScope<NavKey>.routeHomeEntry(backStack: NavBackStack<Na
             onNavigate = { route -> backStack.navigateTo(route) },
             openUrl = { url ->
                 context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+            }
+        )
+    }
+}
+
+@Composable
+private fun EntryProviderScope<NavKey>.routeDeudasEntry(backStack: NavBackStack<NavKey>) {
+    entry<NavigationRoute.DeudasScreen> {
+        DeudasConsultaScreen(
+            onEvent = { event ->
+                when (event) {
+                    DeudasConsultaEvent.NavigateBack -> {backStack.navigateTo(NavigationRoute.HomeScreen)}
+                    is DeudasConsultaEvent.NavigateToResultados -> TODO()
+                    is DeudasConsultaEvent.ShowSnackbar -> TODO()
+                }
+
             }
         )
     }
