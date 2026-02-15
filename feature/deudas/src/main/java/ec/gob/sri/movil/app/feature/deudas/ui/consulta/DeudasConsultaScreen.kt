@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -58,6 +59,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ec.gob.sri.movil.common.framework.ui.components.SriButton
 import ec.gob.sri.movil.common.framework.ui.theme.SRITheme
 
 @Composable
@@ -114,7 +116,8 @@ fun DeudasConsultaContentScreen(
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -126,6 +129,9 @@ fun DeudasConsultaContentScreen(
             ElevatedCard(
                 colors = CardDefaults.elevatedCardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                ),
+                elevation = CardDefaults.elevatedCardElevation(
+                    defaultElevation = 2.dp
                 ),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -234,15 +240,15 @@ fun DeudasConsultaContentScreen(
             }
 
             // ---------- CTA ----------
-            PrimaryLoadingButton(
+            SriButton(
                 text = "Consultar",
-                loading = state.isLoading,
-                enabled = state.isValid && !state.isLoading,
                 onClick = {
                     focusManager.clearFocus()
                     onAction(DeudasConsultaAction.ConsultarClicked)
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = state.isValid && !state.isLoading,
+                isLoading = state.isLoading,
             )
 
             Spacer(Modifier.height(8.dp))
@@ -268,10 +274,31 @@ fun ContribuyenteSegmented(
     SingleChoiceSegmentedButtonRow(modifier = modifier.fillMaxWidth()) {
         val items = ContribuyenteType.entries
         items.forEachIndexed { index, item ->
+
+            val shape = when (index) {
+                0 -> RoundedCornerShape(
+                    topStart = 10.dp,
+                    bottomStart = 10.dp
+                )
+
+                items.lastIndex -> RoundedCornerShape(
+                    topEnd = 10.dp,
+                    bottomEnd = 10.dp
+                )
+
+                else -> RoundedCornerShape(0.dp)
+            }
+
             SegmentedButton(
                 selected = selected == item,
                 onClick = { onSelected(item) },
-                shape = SegmentedButtonDefaults.itemShape(index = index, count = items.size),
+                shape = shape,
+                colors = SegmentedButtonDefaults.colors(
+                    activeContainerColor = MaterialTheme.colorScheme.primary,
+                    activeContentColor = MaterialTheme.colorScheme.onPrimary,
+                    inactiveContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                    inactiveContentColor = MaterialTheme.colorScheme.onSurface
+                ),
                 label = { Text(text = item.label) }
             )
         }
@@ -289,8 +316,8 @@ fun IdTypeDropdown(
 
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { !expanded },
-        modifier = Modifier
+        onExpandedChange = { expanded = !expanded },
+        modifier = modifier.fillMaxWidth()
     ) {
         OutlinedTextField(
             value = value.label,

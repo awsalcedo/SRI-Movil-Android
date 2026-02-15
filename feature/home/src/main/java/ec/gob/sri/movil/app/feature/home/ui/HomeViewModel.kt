@@ -60,6 +60,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
 
         viewModelScope.launch {
             when (id) {
+                "deudas" -> eventChannel.send(HomeEvent.NavigateTo(NavigationRoute.DeudasScreen))
                 "estado_tributario" -> eventChannel.send(HomeEvent.NavigateTo(NavigationRoute.EstadoTributarioScreen))
                 "cita_previa" -> eventChannel.send(HomeEvent.OpenUrl("https://srienlinea.sri.gob.ec/turnos-internet-web/publico/menu.jsf"))
             }

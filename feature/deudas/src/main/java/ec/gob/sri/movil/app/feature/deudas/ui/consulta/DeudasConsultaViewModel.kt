@@ -30,7 +30,7 @@ class DeudasConsultaViewModel @Inject constructor(
             }
 
             is DeudasConsultaAction.NombresChanged -> {
-                _state.update { it.copy(cedula = action.value) }
+                _state.update { it.copy(nombres = action.value) }
             }
 
             is DeudasConsultaAction.RucChanged -> {
