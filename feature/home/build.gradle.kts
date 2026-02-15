@@ -61,7 +61,6 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
 
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.compose.material3)
 
     // Hilt
     implementation(libs.hilt.android)

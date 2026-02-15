@@ -12,7 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ec.gob.sri.movil.app.feature.home.ui.BottomMenuItem
 import ec.gob.sri.movil.app.feature.home.ui.iconVector
-import ec.gob.sri.movil.common.framework.ui.theme.SRITheme
+import ec.gob.sri.movil.common.framework.ui.theme.SRIAppTheme
 
 
 @Composable
@@ -53,7 +53,7 @@ fun FloatingBottomMenuBar(
 @Preview(name = "Light theme")
 @Composable
 fun FloatingBottomMenuBarPreview() {
-    SRITheme(darkTheme = false) {
+    SRIAppTheme(darkTheme = false) {
         FloatingBottomMenuBar(
             selected = BottomMenuItem.Home,
             onSelected = {}
@@ -64,7 +64,7 @@ fun FloatingBottomMenuBarPreview() {
 @Preview(name = "Dark theme")
 @Composable
 fun FloatingBottomMenuBarDarkPreview() {
-    SRITheme(darkTheme = true) {
+    SRIAppTheme(darkTheme = true) {
         FloatingBottomMenuBar(
             selected = BottomMenuItem.Noticias,
             onSelected = {}

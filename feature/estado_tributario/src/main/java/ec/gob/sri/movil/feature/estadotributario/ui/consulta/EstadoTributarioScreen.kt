@@ -30,7 +30,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ec.gob.sri.movil.common.framework.ui.components.SriButton
 import ec.gob.sri.movil.common.framework.ui.components.SriTextField
-import ec.gob.sri.movil.common.framework.ui.theme.SRITheme
+import ec.gob.sri.movil.common.framework.ui.theme.SRIAppTheme
 import ec.gob.sri.movil.common.framework.ui.util.ObserveAsEvents
 
 @Composable
@@ -161,7 +161,7 @@ fun EstadoTributarioContent(
 @Preview(showBackground = true, widthDp = 360)
 @Composable
 private fun EstadoTributarioLightContentPreview() {
-    SRITheme(darkTheme = false) {
+    SRIAppTheme(darkTheme = false) {
         val snackbarState = remember {
             SnackbarHostState()
         }
@@ -177,7 +177,7 @@ private fun EstadoTributarioLightContentPreview() {
 @Preview(showBackground = true, widthDp = 360)
 @Composable
 private fun EstadoTributarioDarkContentPreview() {
-    SRITheme(darkTheme = true) {
+    SRIAppTheme(darkTheme = true) {
         val snackbarState = remember {
             SnackbarHostState()
         }

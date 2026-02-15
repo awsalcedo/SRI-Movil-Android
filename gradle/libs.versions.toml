@@ -33,7 +33,6 @@ compileSdk = "36"
 targetSdk = "36"
 runtime = "1.10.2"
 javaxInject = "1"
-material3 = "1.4.0"
 
 
 [libraries]
@@ -98,8 +97,6 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 
 javax-inject = { group = "javax.inject", name = "javax.inject", version.ref = "javaxInject" }
-androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
-
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

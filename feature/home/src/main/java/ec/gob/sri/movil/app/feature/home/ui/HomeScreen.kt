@@ -1,27 +1,30 @@
 package ec.gob.sri.movil.app.feature.home.ui
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Article
+import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.QrCodeScanner
-import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.RequestPage
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CardDefaults
@@ -29,27 +32,25 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ec.gob.sri.movil.app.common.navigation.NavigationRoute
 import ec.gob.sri.movil.app.feature.home.ui.components.PillBottomNavBar
+import ec.gob.sri.movil.common.framework.ui.theme.SRIAppTheme
 import ec.gob.sri.movil.common.framework.ui.theme.SRITheme
 import kotlinx.coroutines.flow.collectLatest
+
 
 enum class BottomMenuItem(val label: String) {
     Home("Home"),
@@ -60,7 +61,7 @@ enum class BottomMenuItem(val label: String) {
 
 fun BottomMenuItem.iconVector() = when (this) {
     BottomMenuItem.Home -> Icons.Default.Home
-    BottomMenuItem.Noticias -> Icons.Default.Article
+    BottomMenuItem.Noticias -> Icons.AutoMirrored.Filled.Article
     BottomMenuItem.Agencias -> Icons.Default.LocationOn
     BottomMenuItem.Login -> Icons.Default.AccountCircle
 }
@@ -82,7 +83,7 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->
-            when(event) {
+            when (event) {
                 is HomeEvent.NavigateTo -> onNavigate(event.route)
                 is HomeEvent.OnError -> TODO()
                 is HomeEvent.OpenUrl -> openUrl(event.url)
@@ -112,10 +113,15 @@ fun HomeContentScreen(
     onHomeItemClick: (id: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+
+    // Design System access
+    val dimens = SRITheme.dimens
+    val typography = SRITheme.typography
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("SRI Móvil") }
+                title = { Text("SRI Móvil", style = typography.titleLarge) }
             )
         },
         bottomBar = {
@@ -133,10 +139,11 @@ fun HomeContentScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
-                    .padding(bottom = 12.dp)
+                    .padding(bottom = dimens.spaceM)
             )
         },
         modifier = modifier
+            .windowInsetsPadding(WindowInsets.safeDrawing)
     ) { padding ->
         Box(
             modifier = Modifier
@@ -149,15 +156,15 @@ fun HomeContentScreen(
             }
 
             LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 160.dp),
+                columns = GridCells.Adaptive(minSize = dimens.homeGridMinCellSize),
                 contentPadding = PaddingValues(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 16.dp,
-                    bottom = 92.dp // deja aire para la barra flotante
+                    start = dimens.screenPadding,
+                    end = dimens.screenPadding,
+                    top = dimens.screenPadding,
+                    bottom = dimens.homeBottomBarClearance
                 ),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(dimens.homeGridSpacing),
+                horizontalArrangement = Arrangement.spacedBy(dimens.homeGridSpacing),
             ) {
                 items(
                     items = state.items,
@@ -175,40 +182,53 @@ fun HomeContentScreen(
 
 // -------------------- COMPONENTS --------------------
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeCard(
     item: HomeItemUi,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val clickModifier = if (item.enabled) {
-        Modifier.clickable(role = Role.Button, onClick = onClick)
-    } else {
-        Modifier
-    }
+    // Design System access
+    val dimens = SRITheme.dimens
+    val colors = SRITheme.colors
+    val typography = SRITheme.typography
+    val shapes = SRITheme.shapes
+
+    val shape = shapes.medium
 
     ElevatedCard(
-        modifier = modifier.then(clickModifier),
+        onClick = onClick,
+        enabled = item.enabled,
+        shape = shape,
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = dimens.homeCardMinHeight)
+            .clip(shape),               // Garantiza ripple redondeado
         colors = CardDefaults.elevatedCardColors(
-            containerColor = if (item.enabled) MaterialTheme.colorScheme.surface
-            else MaterialTheme.colorScheme.surfaceVariant
-        )
+            containerColor = if (item.enabled) colors.surfaceContainerLow
+            else colors.surfaceVariant
+        ),
+        elevation = CardDefaults.elevatedCardElevation(
+            defaultElevation = dimens.cardElevationLow
+        ),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+                .padding(dimens.cardPadding),
+            verticalArrangement = Arrangement.spacedBy(dimens.spaceS)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(dimens.spaceM)
             ) {
                 item.icon()
 
                 Text(
                     text = item.title,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = typography.titleMedium,
+                    minLines = 2,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -223,8 +243,9 @@ private fun HomeCard(
             if (!supporting.isNullOrBlank()) {
                 Text(
                     text = supporting,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = typography.bodySmall,
+                    color = colors.onSurfaceVariant,
+                    minLines = 2,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -237,7 +258,7 @@ private fun HomeCard(
 @Preview(name = "Home - Light", showBackground = true)
 @Composable
 private fun HomeContentScreenPreview_Light() {
-    SRITheme(darkTheme = false) {
+    SRIAppTheme(darkTheme = false) {
         HomeContentScreen(
             state = HomeState(
                 items = listOf(
@@ -272,7 +293,12 @@ private fun HomeContentScreenPreview_Light() {
                         title = "Deudas",
                         subtitle = "Firmes y en gestión",
                         enabled = true,
-                        icon = { Icon(Icons.Default.ReceiptLong, contentDescription = null) }
+                        icon = {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ReceiptLong,
+                                contentDescription = null
+                            )
+                        }
                     ),
                     HomeItemUi(
                         id = "validez",
@@ -427,7 +453,7 @@ private fun HomeContentScreenPreview_Light() {
 @Preview(name = "Home - Dark", showBackground = true)
 @Composable
 private fun HomeContentScreenPreview_Dark() {
-    SRITheme(darkTheme = true) {
+    SRIAppTheme(darkTheme = true) {
         HomeContentScreen(
             state = HomeState(
                 items = listOf(
@@ -462,7 +488,12 @@ private fun HomeContentScreenPreview_Dark() {
                         title = "Deudas",
                         subtitle = "Firmes y en gestión",
                         enabled = true,
-                        icon = { Icon(Icons.Default.ReceiptLong, contentDescription = null) }
+                        icon = {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ReceiptLong,
+                                contentDescription = null
+                            )
+                        }
                     ),
                     HomeItemUi(
                         id = "validez",

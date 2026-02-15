@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ec.gob.sri.movil.app.feature.home.ui.BottomMenuItem
 import ec.gob.sri.movil.app.feature.home.ui.iconVector
-import ec.gob.sri.movil.common.framework.ui.theme.SRITheme
+import ec.gob.sri.movil.common.framework.ui.theme.SRIAppTheme
 
 @Composable
 fun PillBottomNavBar(
@@ -111,7 +111,7 @@ private fun PillNavItem(
 @Preview(name = "PillBottomNavBar - Light", showBackground = true, backgroundColor = 0xFFF2F2F2)
 @Composable
 private fun PillBottomNavBarPreview_Light() {
-    SRITheme(darkTheme = false) {
+    SRIAppTheme(darkTheme = false) {
         PillBottomNavBar(
             selected = BottomMenuItem.Home,
             onSelected = {}
@@ -122,7 +122,7 @@ private fun PillBottomNavBarPreview_Light() {
 @Preview(name = "PillBottomNavBar - Dark", showBackground = true, backgroundColor = 0xFF111111)
 @Composable
 private fun PillBottomNavBarPreview_Dark() {
-    SRITheme(darkTheme = true) {
+    SRIAppTheme(darkTheme = true) {
         PillBottomNavBar(
             selected = BottomMenuItem.Noticias,
             onSelected = {}

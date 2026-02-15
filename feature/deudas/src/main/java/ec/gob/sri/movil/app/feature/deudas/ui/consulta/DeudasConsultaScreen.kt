@@ -6,14 +6,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -60,7 +63,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ec.gob.sri.movil.common.framework.ui.components.SriButton
-import ec.gob.sri.movil.common.framework.ui.theme.SRITheme
+import ec.gob.sri.movil.common.framework.ui.theme.SRIAppTheme
 
 @Composable
 fun DeudasConsultaScreen(
@@ -93,10 +96,11 @@ fun DeudasConsultaContentScreen(
 
     Scaffold(
         modifier = modifier
-            .fillMaxSize()
-            .windowInsetsPadding(androidx.compose.foundation.layout.WindowInsets.safeDrawing),
+            .fillMaxSize(),
+        contentWindowInsets = WindowInsets.safeDrawing,
         topBar = {
             CenterAlignedTopAppBar(
+                windowInsets = WindowInsets.statusBars.union(WindowInsets.displayCutout),
                 title = {
                     Text(
                         "Deudas",
@@ -443,7 +447,7 @@ private fun String.normalizeName(): String =
 @Preview(showBackground = true)
 @Composable
 fun DeudasConsulta_Light_Ruc_Preview() {
-    SRITheme(darkTheme = false) {
+    SRIAppTheme(darkTheme = false) {
         DeudasConsultaContentScreen(
             state = DeudasConsultaUiState(
                 tipoContribuyente = ContribuyenteType.PERSONA_NATURAL,
@@ -458,7 +462,7 @@ fun DeudasConsulta_Light_Ruc_Preview() {
 @Preview(showBackground = true)
 @Composable
 private fun DeudasConsulta_Light_Cedula_Preview() {
-    SRITheme(darkTheme = false) {
+    SRIAppTheme(darkTheme = false) {
         DeudasConsultaContentScreen(
             state = DeudasConsultaUiState(
                 tipoContribuyente = ContribuyenteType.PERSONA_NATURAL,
@@ -473,7 +477,7 @@ private fun DeudasConsulta_Light_Cedula_Preview() {
 @Preview(showBackground = true)
 @Composable
 private fun DeudasConsulta_Dark_ApellidosNombres_Preview() {
-    SRITheme(darkTheme = true) {
+    SRIAppTheme(darkTheme = true) {
         DeudasConsultaContentScreen(
             state = DeudasConsultaUiState(
                 tipoContribuyente = ContribuyenteType.PERSONA_JURIDICA,

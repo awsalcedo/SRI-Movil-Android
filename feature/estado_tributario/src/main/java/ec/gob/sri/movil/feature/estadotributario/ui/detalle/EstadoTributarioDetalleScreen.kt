@@ -63,7 +63,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ec.gob.sri.movil.app.feature.deudas.domain.models.DeudasDomain
-import ec.gob.sri.movil.common.framework.ui.theme.SRITheme
+import ec.gob.sri.movil.common.framework.ui.theme.SRIAppTheme
 import ec.gob.sri.movil.common.framework.ui.theme.SriStatus
 import ec.gob.sri.movil.feature.estadotributario.R
 import ec.gob.sri.movil.feature.estadotributario.domain.models.EstadoTributarioDomain
@@ -996,7 +996,7 @@ fun EstadoTributarioDetalleLightScreenPreview_ActivoConObligaciones() {
             ObligacionesPendientesDomain("DECLARACIÓN DE IVA PAGO", listOf("OCTUBRE 2023"))
         )
     )
-    SRITheme(darkTheme = false) {
+    SRIAppTheme(darkTheme = false) {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
@@ -1037,7 +1037,7 @@ fun EstadoTributarioDetalleDarkScreenPreview_ActivoConObligaciones() {
             ObligacionesPendientesDomain("DECLARACIÓN DE IVA PAGO", listOf("OCTUBRE 2023"))
         )
     )
-    SRITheme(darkTheme = true) {
+    SRIAppTheme(darkTheme = true) {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
@@ -1081,7 +1081,7 @@ fun EstadoTributarioDetalleLightScreenPreview_ActivoSinObligaciones() {
             )
         )
     )
-    SRITheme(darkTheme = false) {
+    SRIAppTheme(darkTheme = false) {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
@@ -1125,7 +1125,7 @@ fun EstadoTributarioDetalleDarkScreenPreview_ActivoSinObligaciones() {
             )
         )
     )
-    SRITheme(darkTheme = true) {
+    SRIAppTheme(darkTheme = true) {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
@@ -1160,7 +1160,7 @@ fun EstadoTributarioDetalleLigthScreenPreview_Inactivo() {
         claseContribuyente = "Otro",
         obligacionesPendientes = emptyList()
     )
-    SRITheme(darkTheme = false) {
+    SRIAppTheme(darkTheme = false) {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
@@ -1195,7 +1195,7 @@ fun EstadoTributarioDetalleDarkScreenPreview_Inactivo() {
         claseContribuyente = "Otro",
         obligacionesPendientes = emptyList()
     )
-    SRITheme(darkTheme = true) {
+    SRIAppTheme(darkTheme = true) {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
