@@ -64,7 +64,7 @@ import androidx.compose.ui.unit.dp
 data class SriDimens(
     val screenPadding: Dp = 16.dp,
     val cardRadius: Dp = 18.dp,
-    val itemRadius: Dp = 14.dp,
+    val itemRadius: Dp = 10.dp,
 
     val spaceXS: Dp = 4.dp,
     val spaceS: Dp = 8.dp,

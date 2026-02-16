@@ -1,10 +1,7 @@
 package ec.gob.sri.movil.app.feature.deudas.ui.consulta
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutout
@@ -13,20 +10,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.union
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,7 +29,6 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults.TrailingIcon
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
@@ -52,7 +43,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
@@ -64,6 +54,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ec.gob.sri.movil.common.framework.ui.components.SriButton
 import ec.gob.sri.movil.common.framework.ui.theme.SRIAppTheme
+import ec.gob.sri.movil.common.framework.ui.theme.SRITheme
 
 @Composable
 fun DeudasConsultaScreen(
@@ -90,6 +81,12 @@ fun DeudasConsultaContentScreen(
     onAction: (DeudasConsultaAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
+
+    // Design System access
+    val dimens = SRITheme.dimens
+    val colors = SRITheme.colors
+    val typography = SRITheme.typography
+
     val focusManager = LocalFocusManager.current
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -104,8 +101,9 @@ fun DeudasConsultaContentScreen(
                 title = {
                     Text(
                         "Deudas",
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
+                        color = colors.primary,
+                        fontWeight = FontWeight.Bold,
+                        style = typography.titleLarge
                     )
                 },
                 navigationIcon = {
@@ -121,27 +119,28 @@ fun DeudasConsultaContentScreen(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = colors.background
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp)
-                .padding(top = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = dimens.screenPadding)
+                .padding(top = dimens.spaceM),
+            verticalArrangement = Arrangement.spacedBy(dimens.spaceL)
         ) {
             ElevatedCard(
+                shape = RoundedCornerShape(dimens.cardRadius),
                 colors = CardDefaults.elevatedCardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                    containerColor = colors.surfaceContainerLow
                 ),
                 elevation = CardDefaults.elevatedCardElevation(
-                    defaultElevation = 2.dp
+                    defaultElevation = dimens.cardElevationLow
                 ),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                    modifier = Modifier.padding(dimens.cardPadding),
+                    verticalArrangement = Arrangement.spacedBy(dimens.cardPadding)
                 ) {
                     // ---------- Contribuyente ----------
                     SectionLabel(text = "Tipo de Contributente")
@@ -151,7 +150,7 @@ fun DeudasConsultaContentScreen(
                         onSelected = { onAction(DeudasConsultaAction.TipoContribuyenteSelected(it)) }
                     )
 
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    HorizontalDivider(color = colors.outlineVariant)
 
                     // ---------- Tipo Identificación ----------
                     SectionLabel(text = "Tipo de Identificación")
@@ -255,17 +254,21 @@ fun DeudasConsultaContentScreen(
                 isLoading = state.isLoading,
             )
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(dimens.spaceS))
         }
     }
 }
 
 @Composable
 fun SectionLabel(text: String) {
+
+    val colors = SRITheme.colors
+    val typography = SRITheme.typography
+
     Text(
         text = text,
-        style = MaterialTheme.typography.labelLarge,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
+        style = typography.labelLarge,
+        color = colors.onSurfaceVariant
     )
 }
 
@@ -275,19 +278,23 @@ fun ContribuyenteSegmented(
     onSelected: (ContribuyenteType) -> Unit,
     modifier: Modifier = Modifier
 ) {
+
+    val colors = SRITheme.colors
+    val dimens = SRITheme.dimens
+
     SingleChoiceSegmentedButtonRow(modifier = modifier.fillMaxWidth()) {
         val items = ContribuyenteType.entries
         items.forEachIndexed { index, item ->
 
             val shape = when (index) {
                 0 -> RoundedCornerShape(
-                    topStart = 10.dp,
-                    bottomStart = 10.dp
+                    topStart = dimens.itemRadius,
+                    bottomStart = dimens.itemRadius
                 )
 
                 items.lastIndex -> RoundedCornerShape(
-                    topEnd = 10.dp,
-                    bottomEnd = 10.dp
+                    topEnd = dimens.itemRadius,
+                    bottomEnd = dimens.itemRadius
                 )
 
                 else -> RoundedCornerShape(0.dp)
@@ -298,10 +305,10 @@ fun ContribuyenteSegmented(
                 onClick = { onSelected(item) },
                 shape = shape,
                 colors = SegmentedButtonDefaults.colors(
-                    activeContainerColor = MaterialTheme.colorScheme.primary,
-                    activeContentColor = MaterialTheme.colorScheme.onPrimary,
-                    inactiveContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                    inactiveContentColor = MaterialTheme.colorScheme.onSurface
+                    activeContainerColor = colors.primary,
+                    activeContentColor = colors.onPrimary,
+                    inactiveContainerColor = colors.surfaceContainerLow,
+                    inactiveContentColor = colors.onSurface
                 ),
                 label = { Text(text = item.label) }
             )
@@ -384,54 +391,6 @@ private fun SriOutlinedField(
         ),
         modifier = modifier.fillMaxWidth()
     )
-}
-
-@Composable
-private fun PrimaryLoadingButton(
-    text: String,
-    loading: Boolean,
-    enabled: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Button(
-        onClick = onClick,
-        enabled = enabled,
-        modifier = modifier.height(52.dp),
-        contentPadding = PaddingValues(horizontal = 20.dp)
-    ) {
-        // ✅ Sin layout jump: reservamos siempre el espacio del loader
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                if (loading) {
-                    CircularProgressIndicator(
-                        strokeWidth = 2.dp,
-                        modifier = Modifier.size(18.dp)
-                    )
-                } else {
-                    Spacer(Modifier.size(18.dp))
-                }
-
-                Spacer(Modifier.width(10.dp))
-
-                Text(text)
-            }
-
-            if (!loading) {
-                Icon(
-                    imageVector = Icons.Outlined.Search,
-                    contentDescription = null,
-                    modifier = Modifier.align(Alignment.CenterEnd)
-                )
-            }
-        }
-    }
 }
 
 private fun String.onlyDigitsMax(max: Int): String =
