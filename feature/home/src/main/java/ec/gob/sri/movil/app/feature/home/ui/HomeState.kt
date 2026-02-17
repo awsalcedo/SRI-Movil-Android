@@ -17,5 +17,5 @@ data class HomeItemUi(
 data class HomeState(
     val items: List<HomeItemUi> = emptyList(),
     val isLoading: Boolean = false,
-    val selectedBottomMenu: BottomMenuItem = BottomMenuItem.Home
+    val searchQuery: String = ""
 )

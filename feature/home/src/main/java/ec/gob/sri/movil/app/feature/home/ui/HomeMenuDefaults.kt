@@ -1,6 +1,5 @@
 package ec.gob.sri.movil.app.feature.home.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Calculate
@@ -17,8 +16,6 @@ import androidx.compose.material.icons.filled.Water
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.painterResource
-import ec.gob.sri.movil.app.feature.home.R
 
 object HomeMenuDefaults {
 
@@ -140,5 +137,9 @@ object HomeMenuDefaults {
 
 @Composable
 private fun HomeIcon(image: androidx.compose.ui.graphics.vector.ImageVector) {
-    Icon(imageVector = image, contentDescription = null, tint = MaterialTheme.colorScheme.primaryContainer)
+    Icon(
+        imageVector = image,
+        contentDescription = null,
+        tint = MaterialTheme.colorScheme.primaryContainer
+    )
 }

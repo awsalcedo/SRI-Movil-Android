@@ -4,7 +4,11 @@ import android.content.Intent
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.navigation3.runtime.EntryProviderScope
@@ -19,41 +23,114 @@ import ec.gob.sri.movil.app.common.navigation.navigateTo
 import ec.gob.sri.movil.app.feature.deudas.ui.consulta.DeudasConsultaEvent
 import ec.gob.sri.movil.app.feature.deudas.ui.consulta.DeudasConsultaScreen
 import ec.gob.sri.movil.app.feature.home.ui.HomeScreen
+import ec.gob.sri.movil.common.framework.ui.components.SriBottomNavBar
+import ec.gob.sri.movil.common.framework.ui.navigation.SriTopLevelNav
 import ec.gob.sri.movil.feature.estadotributario.ui.consulta.EstadoTributarioScreen
 import ec.gob.sri.movil.feature.estadotributario.ui.detalle.EstadoTributarioDetalleScreen
 
 @Composable
 fun AppNavigation() {
     val backStack = rememberNavBackStack(NavigationRoute.HomeScreen)
+    val current = backStack.lastOrNull()
 
-    NavDisplay(
-        backStack = backStack,
-        onBack = { backStack.back() },
-        entryProvider = entryProvider {
-            routeHomeEntry(backStack)
-            routeEstadoTributarioEntry(backStack)
-            routeEstadoTributarioDetalleEntry(backStack)
-            routeDeudasEntry(backStack)
-        },
-        transitionSpec = {
-            slideInHorizontally(
-                initialOffsetX = { it }
-            ) togetherWith
-                    slideOutHorizontally(targetOffsetX = { it })
-        },
-        popTransitionSpec = {
-            slideInHorizontally(
-                initialOffsetX = { -it }
-            ) togetherWith
-                    slideOutHorizontally(targetOffsetX = { it })
-        },
-        predictivePopTransitionSpec = {
-            slideInHorizontally(
-                initialOffsetX = { -it }
-            ) togetherWith
-                    slideOutHorizontally(targetOffsetX = { it })
+    val showBottomBar = current.isTopLevelDestination()
+
+    // Mientras solo exista Home como top-level, quedará seleccionado Home.
+    // Cuando tengas Noticias/Agencias/Login como routes reales, cambias el mapper.
+    val selectedBottomId = current.toTopLevelIdOrNull() ?: TopLevelId.HOME
+
+    // Fuente única de verdad para los items top-level (sin Icons aquí).
+    val bottomItems = SriTopLevelNav.items
+
+
+
+    Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        bottomBar = {
+            if (showBottomBar) {
+                SriBottomNavBar(
+                    items = bottomItems,
+                    selectedId = selectedBottomId,
+                    onItemSelected = { item ->
+                        backStack.navigateToTopLevel(item.id)
+                    }
+                )
+            }
         }
-    )
+    ) { padding ->
+
+        NavDisplay(
+            backStack = backStack,
+            onBack = { backStack.back() },
+            entryProvider = entryProvider {
+                routeHomeEntry(backStack)
+                routeEstadoTributarioEntry(backStack)
+                routeEstadoTributarioDetalleEntry(backStack)
+                routeDeudasEntry(backStack)
+
+                // routeNoticiasEntry(backStack)
+                // routeAgenciasEntry(backStack)
+                // routeLoginEntry(backStack)
+            },
+            transitionSpec = {
+                slideInHorizontally(
+                    initialOffsetX = { it }
+                ) togetherWith
+                        slideOutHorizontally(targetOffsetX = { it })
+            },
+            popTransitionSpec = {
+                slideInHorizontally(
+                    initialOffsetX = { -it }
+                ) togetherWith
+                        slideOutHorizontally(targetOffsetX = { it })
+            },
+            predictivePopTransitionSpec = {
+                slideInHorizontally(
+                    initialOffsetX = { -it }
+                ) togetherWith
+                        slideOutHorizontally(targetOffsetX = { it })
+            },
+            modifier = Modifier.padding(padding)
+        )
+    }
+}
+
+private fun NavBackStack<NavKey>.navigateToTopLevel(id: String) {
+    when (id) {
+        TopLevelId.HOME -> navigateTo(NavigationRoute.HomeScreen)
+
+        // Cuando existan:
+        // TopLevelId.NOTICIAS -> navigateTo(NavigationRoute.NoticiasScreen)
+        // TopLevelId.AGENCIAS -> navigateTo(NavigationRoute.AgenciasScreen)
+        // TopLevelId.LOGIN -> navigateTo(NavigationRoute.LoginScreen)
+
+        else -> Unit
+    }
+}
+
+/**
+ * Top-level = donde el bottom bar se mantiene visible.
+ * Por ahora solo Home. Luego agregas Noticias/Agencias/Login.
+ */
+private fun NavKey?.isTopLevelDestination(): Boolean = toTopLevelIdOrNull() != null
+
+/**
+ * Mapper de NavKey -> id del bottom bar.
+ * Por ahora sólo Home existe como top-level real.
+ */
+private fun NavKey?.toTopLevelIdOrNull(): String? = when (this) {
+    is NavigationRoute.HomeScreen -> TopLevelId.HOME
+    // is NavigationRoute.NoticiasScreen -> TopLevelId.NOTICIAS
+    // is NavigationRoute.AgenciasScreen -> TopLevelId.AGENCIAS
+    // is NavigationRoute.LoginScreen -> TopLevelId.LOGIN
+    else -> null
+}
+
+private object TopLevelId {
+    const val HOME = "home"
+    const val NOTICIAS = "noticias"
+    const val AGENCIAS = "agencias"
+    const val LOGIN = "login"
 }
 
 @Composable
@@ -75,7 +152,10 @@ private fun EntryProviderScope<NavKey>.routeDeudasEntry(backStack: NavBackStack<
         DeudasConsultaScreen(
             onEvent = { event ->
                 when (event) {
-                    DeudasConsultaEvent.NavigateBack -> {backStack.navigateTo(NavigationRoute.HomeScreen)}
+                    DeudasConsultaEvent.NavigateBack -> {
+                        backStack.navigateTo(NavigationRoute.HomeScreen)
+                    }
+
                     is DeudasConsultaEvent.NavigateToResultados -> TODO()
                     is DeudasConsultaEvent.ShowSnackbar -> TODO()
                 }

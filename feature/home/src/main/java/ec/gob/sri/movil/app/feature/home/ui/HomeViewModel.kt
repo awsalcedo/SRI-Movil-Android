@@ -23,10 +23,15 @@ class HomeViewModel @Inject constructor() : ViewModel() {
 
     fun onAction(action: HomeAction) {
         when (action) {
-            is HomeAction.OnBottomMenuClick -> TODO()
             is HomeAction.OnHomeItemClick -> handleHomeItemClick(action.id)
             HomeAction.OnLoad -> load()
+            is HomeAction.OnSearchChanged -> onSearchChanged(action.query)
         }
+    }
+
+    private fun onSearchChanged(query: String) {
+        // UI-only: guardamos query en state (dominio vendrá después)
+        _state.update { it.copy(searchQuery = query) }
     }
 
     private fun load() {

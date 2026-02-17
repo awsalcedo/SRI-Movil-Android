@@ -77,5 +77,20 @@ data class SriDimens(
     val homeGridSpacing: Dp = 12.dp,
     val homeBottomBarClearance: Dp = 92.dp,
     val homeGridMinCellSize: Dp = 160.dp,
+
+    // Elevations
     val cardElevationLow: Dp = 2.dp,
+    val cardElevationMed: Dp = 6.dp,
+    val bannerElevation: Dp = 8.dp,
+    val searchElevation: Dp = 4.dp,
+
+    // Home specific sizes
+    val homeSearchMinHeight: Dp = 56.dp,
+    val homeBannerMinHeight: Dp = 190.dp,
+
+    // Icon tile paddings
+    val homeIconTilePaddingH: Dp = 12.dp,
+    val homeIconTilePaddingV: Dp = 10.dp,
+
+    val searchMinHeight: Dp = 52.dp
 )
