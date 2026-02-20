@@ -3,7 +3,7 @@ package ec.gob.sri.movil.feature.estadotributario.ui.detalle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import ec.gob.sri.movil.app.feature.deudas.domain.usecase.ConsultarDeudasUseCase
+import ec.gob.sri.movil.app.feature.deudas.domain.usecase.ConsultarDeudasPorRucUseCase
 import ec.gob.sri.movil.common.domain.error.DataResult
 import ec.gob.sri.movil.common.framework.ui.error.toUiText
 import ec.gob.sri.movil.feature.estadotributario.domain.models.ObligacionesPendientesDomain
@@ -21,7 +21,7 @@ import javax.inject.Inject
 class EstadoTributarioDetalleViewModel @Inject constructor(
     private val getCachedEstadoTributarioUseCase: GetCachedEstadoTributarioUseCase,
     private val obtenerEstadoTributarioUseCase: ObtenerEstadoTributarioUseCase,
-    private val consultarDeudasUseCase: ConsultarDeudasUseCase
+    private val consultarDeudasPorRucUseCase: ConsultarDeudasPorRucUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(EstadoTributarioDetalleState())
     val state = _state.asStateFlow()
@@ -126,7 +126,7 @@ class EstadoTributarioDetalleViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            when (val result = consultarDeudasUseCase(ruc)) {
+            when (val result = consultarDeudasPorRucUseCase(ruc)) {
                 is DataResult.Success -> {
                     _state.update {
                         it.copy(

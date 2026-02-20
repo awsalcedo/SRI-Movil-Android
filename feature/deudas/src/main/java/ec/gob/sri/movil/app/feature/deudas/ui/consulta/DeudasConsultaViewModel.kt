@@ -2,6 +2,7 @@ package ec.gob.sri.movil.app.feature.deudas.ui.consulta
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ec.gob.sri.movil.app.feature.deudas.domain.usecase.ConsultarPorIdentificacionUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,7 +12,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DeudasConsultaViewModel @Inject constructor(
-
+    private val consultarPorIdentificacionUseCase: ConsultarPorIdentificacionUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(DeudasConsultaUiState())
     val state = _state.asStateFlow()
@@ -36,6 +37,7 @@ class DeudasConsultaViewModel @Inject constructor(
             is DeudasConsultaAction.RucChanged -> {
                 _state.update { it.copy(ruc = action.value) }
             }
+
             is DeudasConsultaAction.TipoContribuyenteSelected -> {
                 _state.update { it.copy(tipoContribuyente = action.value) }
             }

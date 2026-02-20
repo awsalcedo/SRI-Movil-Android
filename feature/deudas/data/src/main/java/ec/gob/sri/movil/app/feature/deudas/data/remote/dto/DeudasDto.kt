@@ -30,6 +30,8 @@ data class ContribuyenteDto(
     val tipoIdentificacion: String,
     @SerialName("resolucion")
     val resolucion: String?,
+    @SerialName("nombreComercial")
+    val nombreComercial: String,
     @SerialName("direccionMatriz")
     val direccionMatriz: String?,
     @SerialName("fechaInformacion")

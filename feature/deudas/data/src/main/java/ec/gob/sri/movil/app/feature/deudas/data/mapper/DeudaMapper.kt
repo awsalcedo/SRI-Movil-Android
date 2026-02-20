@@ -3,10 +3,12 @@ package ec.gob.sri.movil.app.feature.deudas.data.mapper
 import ec.gob.sri.movil.app.feature.deudas.data.remote.dto.ContribuyenteDto
 import ec.gob.sri.movil.app.feature.deudas.data.remote.dto.DetalleRubroDto
 import ec.gob.sri.movil.app.feature.deudas.data.remote.dto.DeudaDto
+import ec.gob.sri.movil.app.feature.deudas.data.remote.dto.DeudaPorDenominacionDto
 import ec.gob.sri.movil.app.feature.deudas.data.remote.dto.DeudasDto
 import ec.gob.sri.movil.app.feature.deudas.domain.models.ContribuyenteDomain
 import ec.gob.sri.movil.app.feature.deudas.domain.models.DetalleRubroDomain
 import ec.gob.sri.movil.app.feature.deudas.domain.models.DeudaDomain
+import ec.gob.sri.movil.app.feature.deudas.domain.models.DeudaPorDenominacionDomain
 import ec.gob.sri.movil.app.feature.deudas.domain.models.DeudasDomain
 
 
@@ -27,6 +29,7 @@ fun ContribuyenteDto.toDomain(): ContribuyenteDomain {
         clase = this.clase,
         tipoIdentificacion = this.tipoIdentificacion,
         resolucion = this.resolucion,
+        nombreComercial = this.nombreComercial,
         direccionMatriz = this.direccionMatriz,
         fechaInformacion = this.fechaInformacion,
         mensaje = this.mensaje,
@@ -49,5 +52,21 @@ fun DetalleRubroDto.toDomain(): DetalleRubroDomain {
         descripcion = this.descripcion,
         anio = this.anio,
         valor = this.valor
+    )
+}
+
+fun DeudaPorDenominacionDto.toDomain(): DeudaPorDenominacionDomain {
+    return DeudaPorDenominacionDomain(
+        identificacion = this.identificacion,
+        denominacion = this.denominacion,
+        tipo = this.tipo,
+        clase = this.clase,
+        tipoIdentificacion = this.tipoIdentificacion,
+        resolucion = this.resolucion,
+        nombreComercial = this.nombreComercial,
+        direccionMatriz = this.direccionMatriz,
+        fechaInformacion = this.fechaInformacion,
+        mensaje = this.mensaje,
+        estado = this.estado
     )
 }

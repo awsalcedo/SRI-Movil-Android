@@ -15,6 +15,7 @@ data class ContribuyenteDomain(
     val clase: String,
     val tipoIdentificacion: String,
     val resolucion: String?,
+    val nombreComercial: String,
     val direccionMatriz: String?,
     val fechaInformacion: Long,
     val mensaje: String?,

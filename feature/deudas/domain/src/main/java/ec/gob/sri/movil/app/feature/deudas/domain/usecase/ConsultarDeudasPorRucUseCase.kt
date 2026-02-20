@@ -6,10 +6,10 @@ import ec.gob.sri.movil.common.domain.error.AppError
 import ec.gob.sri.movil.common.domain.error.DataResult
 import javax.inject.Inject
 
-class ConsultarDeudasUseCase @Inject constructor(
+class ConsultarDeudasPorRucUseCase @Inject constructor(
     private val repository: DeudasRepository
 ) {
     suspend operator fun invoke(ruc: String): DataResult<DeudasDomain, AppError> {
-        return repository.consultarDeudas(ruc = ruc)
+        return repository.consultarDeudasPorRuc(ruc = ruc)
     }
 }
