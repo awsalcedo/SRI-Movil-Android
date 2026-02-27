@@ -394,14 +394,14 @@ private fun DeudasContent(deudas: DeudasDomain) {
     ) {
         SummaryCard(
             fechaCorteMillis = contrib.fechaInformacion,
-            valor = deuda.valor,
-            descripcion = deuda.descripcion
+            valor = deuda?.valor ?: 0.0,
+            descripcion = deuda?.descripcion ?: "Sin deuda registrada"
         )
 
         InfoBlockCard(title = "Impugnaciones", value = impugnacion)
         InfoBlockCard(title = "Remisión", value = remision)
 
-        val detalles = deuda.detallesRubro.orEmpty()
+        val detalles = deuda?.detallesRubro.orEmpty()
         if (detalles.isNotEmpty()) {
             Text(
                 text = "Detalle por rubro",

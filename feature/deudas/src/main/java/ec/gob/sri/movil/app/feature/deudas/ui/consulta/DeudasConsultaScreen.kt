@@ -38,12 +38,12 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -55,21 +55,38 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ec.gob.sri.movil.common.framework.ui.components.SriButton
 import ec.gob.sri.movil.common.framework.ui.theme.SRIAppTheme
 import ec.gob.sri.movil.common.framework.ui.theme.SRITheme
+import ec.gob.sri.movil.common.framework.ui.util.ObserveAsEvents
 
 @Composable
 fun DeudasConsultaScreen(
     viewModel: DeudasConsultaViewModel = hiltViewModel(),
-    onEvent: (DeudasConsultaEvent) -> Unit
+    onNavigateToResultados: (DeudasQuery) -> Unit,
+    onBack: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        viewModel.events.collect { event -> onEvent(event) }
+    val snackbarState = remember {
+        SnackbarHostState()
+    }
+
+    ObserveAsEvents(viewModel.events) { event ->
+        when (event) {
+            is DeudasConsultaEvent.OnError -> {
+                snackbarState.showSnackbar(event.message.asString(context))
+            }
+
+            is DeudasConsultaEvent.NavigateToResultados -> {
+                onNavigateToResultados(event.query)
+            }
+        }
     }
 
     DeudasConsultaContentScreen(
         state = state,
-        onAction = viewModel::onAction
+        snackbarState = snackbarState,
+        onAction = viewModel::onAction,
+        onBack = onBack
     )
 
 }
@@ -78,7 +95,9 @@ fun DeudasConsultaScreen(
 @Composable
 fun DeudasConsultaContentScreen(
     state: DeudasConsultaUiState,
+    snackbarState: SnackbarHostState,
     onAction: (DeudasConsultaAction) -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -88,8 +107,6 @@ fun DeudasConsultaContentScreen(
     val typography = SRITheme.typography
 
     val focusManager = LocalFocusManager.current
-
-    val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
         modifier = modifier
@@ -107,7 +124,7 @@ fun DeudasConsultaContentScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { onAction(DeudasConsultaAction.BackClicked) }) {
+                    IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver"
@@ -117,7 +134,7 @@ fun DeudasConsultaContentScreen(
             )
         },
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
+            SnackbarHost(hostState = snackbarState)
         },
         containerColor = colors.background
     ) { paddingValues ->
@@ -155,8 +172,16 @@ fun DeudasConsultaContentScreen(
                     // ---------- Tipo Identificación ----------
                     SectionLabel(text = "Tipo de Identificación")
 
+                    val idTypeOptions = remember(state.tipoContribuyente) {
+                        when (state.tipoContribuyente) {
+                            ContribuyenteType.PERSONA_JURIDICA -> listOf(IdType.RUC, IdType.RAZON_SOCIAL)
+                            ContribuyenteType.PERSONA_NATURAL -> listOf(IdType.CEDULA, IdType.RUC, IdType.APELLIDOS_NOMBRES)
+                        }
+                    }
+
                     IdTypeDropdown(
                         value = state.idType,
+                        options = idTypeOptions,
                         onChange = { onAction(DeudasConsultaAction.IdTypeSelected(it)) }
                     )
 
@@ -219,6 +244,7 @@ fun DeudasConsultaContentScreen(
                                 onImeDone = { /* no-op: Next */ }
                             )
 
+                            // Nombres (opcionales)
                             SriOutlinedField(
                                 label = "Nombres",
                                 value = state.nombres,
@@ -235,6 +261,25 @@ fun DeudasConsultaContentScreen(
                                     if (!state.isLoading && state.isValid) {
                                         onAction(DeudasConsultaAction.ConsultarClicked)
                                     }
+                                }
+                            )
+                        }
+
+                        IdType.RAZON_SOCIAL -> {
+                            SriOutlinedField(
+                                label = "Razón Social",
+                                value = state.razonSocialInput,
+                                placeholder = "Ej. MI EMPRESA S.A.",
+                                supporting = "Ingresa la razón social del contribuyente.",
+                                isError = false,
+                                keyboardType = KeyboardType.Text,
+                                imeAction = ImeAction.Done,
+                                onValueChange = {
+                                    onAction(DeudasConsultaAction.RazonSocialChanged(it.normalizeName()))
+                                },
+                                onImeDone = {
+                                    focusManager.clearFocus()
+                                    if (!state.isLoading && state.isValid) onAction(DeudasConsultaAction.ConsultarClicked)
                                 }
                             )
                         }
@@ -320,6 +365,7 @@ fun ContribuyenteSegmented(
 @Composable
 fun IdTypeDropdown(
     value: IdType,
+    options: List<IdType>,
     onChange: (IdType) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -348,7 +394,7 @@ fun IdTypeDropdown(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            IdType.entries.forEach { option ->
+            options.forEach { option ->
                 DropdownMenuItem(
                     text = { Text(option.label) },
                     onClick = {
@@ -397,8 +443,8 @@ private fun String.onlyDigitsMax(max: Int): String =
     filter(Char::isDigit).take(max)
 
 private fun String.normalizeName(): String =
-    trim()
-        .replace(Regex("\\s+"), " ")
+    replace(Regex("\\s+"), " ")
+        .trimStart()     // NO borra el espacio final mientras el usuario tipea
         .uppercase()
 
 // ------------------------ PREVIEWS ------------------------
@@ -407,13 +453,18 @@ private fun String.normalizeName(): String =
 @Composable
 fun DeudasConsulta_Light_Ruc_Preview() {
     SRIAppTheme(darkTheme = false) {
+        val snackbarState = remember {
+            SnackbarHostState()
+        }
         DeudasConsultaContentScreen(
             state = DeudasConsultaUiState(
                 tipoContribuyente = ContribuyenteType.PERSONA_NATURAL,
                 idType = IdType.RUC,
                 ruc = "1712245974001"
             ),
-            onAction = {}
+            onAction = {},
+            snackbarState = snackbarState,
+            onBack = {}
         )
     }
 }
@@ -422,13 +473,18 @@ fun DeudasConsulta_Light_Ruc_Preview() {
 @Composable
 private fun DeudasConsulta_Light_Cedula_Preview() {
     SRIAppTheme(darkTheme = false) {
+        val snackbarState = remember {
+            SnackbarHostState()
+        }
         DeudasConsultaContentScreen(
             state = DeudasConsultaUiState(
                 tipoContribuyente = ContribuyenteType.PERSONA_NATURAL,
                 idType = IdType.CEDULA,
                 cedula = "1712245974"
             ),
-            onAction = {}
+            onAction = {},
+            snackbarState = snackbarState,
+            onBack = {}
         )
     }
 }
@@ -437,6 +493,9 @@ private fun DeudasConsulta_Light_Cedula_Preview() {
 @Composable
 private fun DeudasConsulta_Dark_ApellidosNombres_Preview() {
     SRIAppTheme(darkTheme = true) {
+        val snackbarState = remember {
+            SnackbarHostState()
+        }
         DeudasConsultaContentScreen(
             state = DeudasConsultaUiState(
                 tipoContribuyente = ContribuyenteType.PERSONA_JURIDICA,
@@ -444,7 +503,9 @@ private fun DeudasConsulta_Dark_ApellidosNombres_Preview() {
                 apellidos = "SALCEDO SILVA",
                 nombres = "ALEX"
             ),
-            onAction = {}
+            onAction = {},
+            snackbarState = snackbarState,
+            onBack = {}
         )
     }
 }

@@ -12,7 +12,7 @@ data class DeudaPorDenominacionDto(
     @SerialName("tipo")
     val tipo: String? = null,
     @SerialName("clase")
-    val clase: String,
+    val clase: String? = null,
     @SerialName("tipoIdentificacion")
     val tipoIdentificacion: String,
     @SerialName("resolucion")

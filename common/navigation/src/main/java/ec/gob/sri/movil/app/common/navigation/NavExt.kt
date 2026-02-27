@@ -20,3 +20,16 @@ fun NavBackStack<NavKey>.backTo(targetScreen: NavKey) {
         removeLastOrNull()
     }
 }
+
+/**
+ * Reemplaza el top del back stack por otra key.
+ * Útil para flujos "router" donde cambias el estado (query) sin apilar pantallas.
+ */
+fun NavBackStack<NavKey>.replaceTop(screen: NavKey) {
+    if (isEmpty()) {
+        add(screen)
+        return
+    }
+    removeLastOrNull()
+    add(screen)
+}

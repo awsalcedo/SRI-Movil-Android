@@ -8,11 +8,11 @@ data class DeudasDto(
     @SerialName("contribuyente")
     val contribuyente: ContribuyenteDto,
     @SerialName("deuda")
-    val deuda: DeudaDto,
+    val deuda: DeudaDto? = null,
     @SerialName("impugnacion")
-    val impugnacion: String?,
+    val impugnacion: String? = null,
     @SerialName("remision")
-    val remision: String?
+    val remision: String? = null
 )
 
 
@@ -21,25 +21,25 @@ data class ContribuyenteDto(
     @SerialName("identificacion")
     val identificacion: String,
     @SerialName("denominacion")
-    val denominacion: String?,
+    val denominacion: String? = null,
     @SerialName("tipo")
-    val tipo: String?,
+    val tipo: String? = null,
     @SerialName("clase")
-    val clase: String,
+    val clase: String? = null,
     @SerialName("tipoIdentificacion")
     val tipoIdentificacion: String,
     @SerialName("resolucion")
-    val resolucion: String?,
+    val resolucion: String? = null,
     @SerialName("nombreComercial")
     val nombreComercial: String,
     @SerialName("direccionMatriz")
-    val direccionMatriz: String?,
+    val direccionMatriz: String? = null,
     @SerialName("fechaInformacion")
     val fechaInformacion: Long,
     @SerialName("mensaje")
-    val mensaje: String?,
+    val mensaje: String? = null,
     @SerialName("estado")
-    val estado: String?
+    val estado: String? = null
 )
 
 @Serializable

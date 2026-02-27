@@ -1,10 +1,9 @@
-package ec.gob.sri.movil.app.feature.deudas.ui.consulta
+package ec.gob.sri.movil.app.feature.deudas.ui.detalle
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutout
@@ -228,7 +227,7 @@ private fun DeudasDetalleContent(
 
         SriDetalleSection(
             title = "DEUDAS FIRMES",
-            value = data.deuda.valor.toUsdEc()
+            value = data.deuda?.valor?.toUsdEc() ?: "No registra deudas firmes"
         )
 
         SriDetalleSection(

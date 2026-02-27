@@ -46,6 +46,7 @@ dependencies {
     implementation(project(":feature:deudas:domain"))
     implementation(project(":common:framework"))
     implementation(project(":common:domain"))
+    implementation(project(":common:navigation"))
 
     // ✅ Compose
     implementation(platform(libs.androidx.compose.bom))

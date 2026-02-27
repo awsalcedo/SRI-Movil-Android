@@ -1,4 +1,4 @@
-package ec.gob.sri.movil.app.feature.deudas.ui.consulta
+package ec.gob.sri.movil.app.feature.deudas.ui.detalle
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

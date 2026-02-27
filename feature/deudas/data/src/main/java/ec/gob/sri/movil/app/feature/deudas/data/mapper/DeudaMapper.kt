@@ -15,7 +15,7 @@ import ec.gob.sri.movil.app.feature.deudas.domain.models.DeudasDomain
 fun DeudasDto.toDomain(): DeudasDomain {
     return DeudasDomain(
         contribuyente = this.contribuyente.toDomain(),
-        deuda = this.deuda.toDomain(),
+        deuda = this.deuda?.toDomain(),
         impugnacion = this.impugnacion,
         remision = this.remision
     )

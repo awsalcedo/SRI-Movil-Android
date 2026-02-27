@@ -4,7 +4,7 @@ data class DeudaPorDenominacionDomain(
     val identificacion: String,
     val denominacion: String?,
     val tipo: String?,
-    val clase: String,
+    val clase: String?,
     val tipoIdentificacion: String,
     val resolucion: String?,
     val nombreComercial: String,

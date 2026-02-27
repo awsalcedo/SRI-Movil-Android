@@ -3,7 +3,7 @@ package ec.gob.sri.movil.app.feature.deudas.domain.models
 
 data class DeudasDomain(
     val contribuyente: ContribuyenteDomain,
-    val deuda: DeudaDomain,
+    val deuda: DeudaDomain?,
     val impugnacion: String?,
     val remision: String?
 )
@@ -12,7 +12,7 @@ data class ContribuyenteDomain(
     val identificacion: String,
     val denominacion: String?,
     val tipo: String?,
-    val clase: String,
+    val clase: String?,
     val tipoIdentificacion: String,
     val resolucion: String?,
     val nombreComercial: String,

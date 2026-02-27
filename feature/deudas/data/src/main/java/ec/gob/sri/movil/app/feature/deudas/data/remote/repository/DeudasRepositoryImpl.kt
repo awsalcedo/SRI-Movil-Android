@@ -15,6 +15,11 @@ class DeudasRepositoryImpl @Inject constructor(private val remoteDataSource: Deu
     private data class CacheKey(val identificacion: String, val tipoPersona: String)
 
     private var lastKey: CacheKey? = null
+
+    private data class NombreKey(val nombre: String, val tipoPersona: String, val resultados: Int)
+
+    private var lastNombreKey: NombreKey? = null
+    private var lastNombreList: List<DeudaPorDenominacionDomain>? = null
     private var last: DeudasDomain? = null
     override suspend fun consultarDeudasPorRuc(ruc: String): DataResult<DeudasDomain, AppError> {
         return remoteDataSource.consultarDeudasPorRuc(ruc = ruc)
@@ -30,7 +35,16 @@ class DeudasRepositoryImpl @Inject constructor(private val remoteDataSource: Deu
             nombre = nombre,
             tipoPersona = tipoPersona,
             resultados = resultados
-        ).map { dtos -> dtos.map { dto -> dto.toDomain() } }
+        ).map { dtos ->
+            dtos.map { dto -> dto.toDomain() }.also { list ->
+                lastNombreList = list
+                lastNombreKey = DeudasRepositoryImpl.NombreKey(
+                    nombre = nombre,
+                    tipoPersona = tipoPersona,
+                    resultados = resultados
+                )
+            }
+        }
     }
 
     override suspend fun consultarPorIdentificacion(
